@@ -1,5 +1,6 @@
 package com.smartshop.platform;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -15,6 +16,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartshop.platform.infrastructure.adapter.out.persistence.InMemoryCategoryRepositoryAdapter;
 import com.smartshop.platform.infrastructure.adapter.out.persistence.InMemoryProductRepositoryAdapter;
 import com.smartshop.platform.infrastructure.adapter.out.persistence.InMemoryUserRepositoryAdapter;
+import javax.sql.DataSource;
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.MigrationInfo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -33,12 +37,31 @@ class SmartShopApplicationTests {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private DataSource dataSource;
+
+    @Autowired
+    private Flyway flyway;
+
     @Test
-    void healthChecksAndOpenApiShouldBeOperational() throws Exception {
+    void databaseConnectionAndFlywayMigrationsShouldBeExecuted() throws Exception {
+        try (var connection = dataSource.getConnection()) {
+            assertThat(connection.isValid(2)).isTrue();
+        }
+
+        MigrationInfo[] appliedMigrations = flyway.info().applied();
+        assertThat(appliedMigrations).hasSizeGreaterThanOrEqualTo(2);
+        assertThat(appliedMigrations[0].getVersion().getVersion()).isEqualTo("1");
+        assertThat(appliedMigrations[1].getVersion().getVersion()).isEqualTo("2");
+
         mockMvc.perform(get("/actuator/health"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("UP"));
+                .andExpect(jsonPath("$.status").value("UP"))
+                .andExpect(jsonPath("$.components.db.status").value("UP"));
+    }
 
+    @Test
+    void healthChecksAndOpenApiShouldBeOperational() throws Exception {
         mockMvc.perform(get("/actuator/health/liveness"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("UP"));
@@ -195,14 +218,14 @@ class SmartShopApplicationTests {
         mockMvc.perform(delete("/api/v1/users/" + userId))
                 .andExpect(status().isNoContent());
 
-        // Verify seeded data remains intact
+        // Verify seeded data from V2 Flyway migration remains intact
         mockMvc.perform(get("/api/v1/products"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(4))));
     }
 
     @Test
-    void seededCatalogUsersCartsAndOrdersShouldBeAccessible() throws Exception {
+    void seededCatalogUsersCartsAndOrdersFromFlywayMigrationShouldBeAccessible() throws Exception {
         mockMvc.perform(get("/api/v1/users/" + InMemoryUserRepositoryAdapter.DEFAULT_CUSTOMER_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.role").value("CUSTOMER"));
