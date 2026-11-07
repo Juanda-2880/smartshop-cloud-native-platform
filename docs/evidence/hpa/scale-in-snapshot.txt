@@ -36,3 +36,4 @@ Events:
   Normal  SuccessfulRescale  63s    horizontal-pod-autoscaler  New size: 7; reason: All metrics below target
   Normal  SuccessfulRescale  48s    horizontal-pod-autoscaler  New size: 6; reason: All metrics below target
   Normal  SuccessfulRescale  17s    horizontal-pod-autoscaler  New size: 2; reason: All metrics below target
+

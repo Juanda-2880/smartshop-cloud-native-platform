@@ -20,3 +20,4 @@ Implement `HorizontalPodAutoscaler` (`autoscaling/v2`) in namespace `smartshop` 
 - **✅ Escala arriba (Scale Out)**: Verified live transition `2 → 6 → 9` pods (`1/1 Running`) when CPU hit `288%/70%`.
 - **✅ Escala abajo (Scale In)**: Verified live transition `9 → 8 → 7 → 6 → 2` pods when CPU returned to `2%/70%` and Memory remained at `23%/80%`.
 - **✅ Evidencia capturada**: Stored in `docs/evidence/hpa/` and `docs/evidence/13-hpa-verification.md`.
+

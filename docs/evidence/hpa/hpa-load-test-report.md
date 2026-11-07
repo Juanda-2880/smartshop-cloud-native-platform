@@ -25,3 +25,4 @@ Once the stress load finished:
   - `New size: 6; reason: All metrics below target`
   - `New size: 2; reason: All metrics below target`
 - Final steady state verified at `2/2` pods `1/1 Running` (`docs/evidence/hpa/scale-in-snapshot.txt`).
+
