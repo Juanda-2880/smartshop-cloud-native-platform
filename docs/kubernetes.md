@@ -60,3 +60,4 @@ Los manifiestos declarativos se organizan modularmente dentro de [`k8s/`](file:/
 - Definir siempre `resources.requests` y `resources.limits` en todos los contenedores.
 - Separar `readinessProbe` (`/actuator/health/readiness`) de `livenessProbe` (`/actuator/health/liveness`) para evitar reinicios en cascada cuando la base de datos experimenta latencia transitoria.
 - Utilizar `imagePullPolicy: IfNotPresent` con etiquetas de versión semántica (`1.0.0`, nunca `:latest`).
+

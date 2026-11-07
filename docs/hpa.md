@@ -43,3 +43,4 @@ flowchart LR
 ## 8. Buenas prácticas
 - Utilizar siempre la API `autoscaling/v2` para combinar múltiples métricas (`cpu` + `memory`) y políticas de comportamiento (`behavior`).
 - Mantener `minReplicas >= 2` en todos los servicios críticos de cara al usuario para evitar puntos únicos de fallo.
+

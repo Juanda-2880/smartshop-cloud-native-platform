@@ -27,3 +27,4 @@ Create and update the 8 required technical documentation files in `docs/` adheri
 ## 3. Definition of Done (DoD) Checklist
 - [x] ✅ Todos los documentos creados (`8/8` archivos en `docs/`)
 - [x] ✅ Todos actualizados con las 8 secciones requeridas y enlaces a los artefactos reales del repositorio
+

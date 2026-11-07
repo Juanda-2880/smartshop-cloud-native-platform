@@ -59,3 +59,4 @@ La implementación de identidad y seguridad está distribuida en:
 - Firmar tokens exclusivamente con criptografía asimétrica (`RS256`) y exponer únicamente las claves públicas vía JWKS (`/.well-known/jwks.json`).
 - Extraer roles desde el claim estándar de Keycloak `realm_access.roles` convirtiéndolos al prefijo `ROLE_` requerido por Spring Security.
 - Mantener los endpoints de salud (`/actuator/health/**`) públicos para las sondas de Kubernetes mientras se protegen las mutaciones de catálogo, carritos y órdenes.
+

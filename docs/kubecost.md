@@ -46,3 +46,4 @@ Los manifiestos de FinOps se ubican en [`cost-management/kubecost/`](file:///c:/
 ## 8. Buenas prácticas
 - Mantener un margen de seguridad (*headroom*) del 20–25% sobre el uso P95 al aplicar recomendaciones de *Right-Sizing*.
 - Combinar las recomendaciones estáticas de Kubecost con el escalamiento dinámico del `HorizontalPodAutoscaler` (`HPA`).
+

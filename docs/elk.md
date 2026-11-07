@@ -53,3 +53,4 @@ Los manifiestos y objetos de Kibana se almacenan en [`logging/elk/`](file:///c:/
 ## 8. Buenas prácticas
 - Montar `/var/log/pods` y `/var/lib/docker/containers` en modo solo lectura (`readOnly: true`) dentro del contenedor recolector.
 - Separar los índices por dominio (`smartshop-logs-backend-YYYY.MM.dd`, `smartshop-logs-frontend-YYYY.MM.dd`, `smartshop-logs-kubernetes-YYYY.MM.dd`) para aplicar políticas de retención diferenciadas.
+

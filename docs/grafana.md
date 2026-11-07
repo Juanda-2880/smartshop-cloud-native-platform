@@ -56,3 +56,4 @@ Los artefactos de Grafana se encuentran en [`observability/grafana/`](file:///c:
 ## 8. Buenas prácticas
 - Asignar siempre un `uid` fijo y semántico a cada datasource (`uid: prometheus`) y a cada dashboard (`smartshop-infra-use`, `smartshop-k8s-cluster`, `smartshop-app-red`, `smartshop-business-kpis`).
 - Versionar los archivos JSON de los dashboards en control de versiones junto con los manifiestos de infraestructura.
+

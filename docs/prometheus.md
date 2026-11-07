@@ -49,3 +49,4 @@ Los manifiestos declarativos se ubican en [`observability/`](file:///c:/Users/ju
 ## 8. Buenas prácticas
 - Utilizar siempre `rate(...[2m])` con `clamp_min(..., 0.0001)` en expresiones PromQL de división para evitar resultados `NaN` cuando el tráfico está en reposo.
 - Habilitar `--web.enable-lifecycle` para permitir recargas de configuración en caliente (`POST /-/reload`) sin reiniciar la base de datos TSDB.
+
