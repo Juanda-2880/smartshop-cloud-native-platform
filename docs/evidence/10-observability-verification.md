@@ -69,3 +69,4 @@ smartshop-backend     up     http://10.244.0.13:8080/actuator/prometheus
 - [x] ✅ Grafana operativo (`v11.5.2`, `database: ok`, datasources `Prometheus` y `Alertmanager` aprovisionados)
 - [x] ✅ Dashboards visibles (`4` dashboards separados por categoría en la carpeta `SmartShop Cloud-Native`)
 - [x] ✅ Alertas funcionando (reglas USE, RED, Kubernetes y Negocio evaluándose en Prometheus y entregadas a Alertmanager)
+
