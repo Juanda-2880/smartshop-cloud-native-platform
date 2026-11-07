@@ -44,3 +44,4 @@ kubectl apply -f rollout/blue-green/ -f rollout/argo-rollouts/argo-rollout-strat
 echo "=================================================================="
 echo " [SmartShop] All manifests applied successfully."
 echo "=================================================================="
+

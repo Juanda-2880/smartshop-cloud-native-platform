@@ -25,3 +25,4 @@ elif [ "${MODE}" = "--scale-zero" ]; then
 else
   echo "Dry-run / safe stop verified. Usage: bash scripts/stop-all.sh [--scale-zero | --cluster]"
 fi
+

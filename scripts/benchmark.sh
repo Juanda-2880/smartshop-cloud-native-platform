@@ -69,3 +69,4 @@ kubectl exec -n smartshop-rollouts deploy/smartshop-app-blue -- sh -c "
 echo "=================================================================="
 echo " [SmartShop] Benchmark Completed Successfully (0% Error Rate)."
 echo "=================================================================="
+

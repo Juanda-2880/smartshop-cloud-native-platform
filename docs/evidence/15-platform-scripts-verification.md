@@ -69,3 +69,4 @@ Implement, document, and verify the 6 operational platform scripts in `scripts/`
 - [x] ✅ Scripts ejecutables (`100755` permisos Git y terminaciones `LF` vía `.gitattributes`)
 - [x] ✅ Scripts documentados (`scripts/README.md`, docblocks en cada script y `docs/evidence/15-platform-scripts-verification.md`)
 - [x] ✅ Scripts funcionales (`validate.sh` `17/17 PASS`, `benchmark.sh` `0% errors`, `status.sh` verificados en vivo)
+

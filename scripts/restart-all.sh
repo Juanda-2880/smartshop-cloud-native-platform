@@ -22,3 +22,4 @@ kubectl rollout status deployment/smartshop-app-blue -n smartshop-rollouts --tim
 echo "=================================================================="
 echo " [SmartShop] Rolling restart completed with zero downtime."
 echo "=================================================================="
+

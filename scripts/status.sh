@@ -43,3 +43,4 @@ kubectl get networkpolicy -n smartshop
 echo "=================================================================="
 echo " [SmartShop] Status Report Complete."
 echo "=================================================================="
+
