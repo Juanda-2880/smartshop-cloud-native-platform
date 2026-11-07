@@ -128,3 +128,4 @@ public class OidcTokenService {
         return headerOrToken.trim();
     }
 }
+

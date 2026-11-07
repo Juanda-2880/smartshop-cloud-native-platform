@@ -23,3 +23,4 @@ Se integró la capa de identidad federada y control de acceso basado en roles (*
 | **Logout funcional** | `POST /api/v1/auth/logout` revoca el `jti` del token; peticiones posteriores con el mismo token reciben `401 Unauthorized` | ✅ |
 | **Roles funcionales** | `ADMIN` accede a `/admin`, `/manager`, `/customer` (`200 OK`); `MANAGER` accede a `/manager` (`200 OK`) y recibe `403 Forbidden` en `/admin`; `CUSTOMER` accede a `/customer` (`200 OK`) y recibe `403 Forbidden` en `/manager` y `/admin` | ✅ |
 | **APIs protegidas** | Peticiones sin token a `/api/v1/auth/me` y `/api/v1/auth/rbac/*` son rechazadas con `401 Unauthorized` | ✅ |
+

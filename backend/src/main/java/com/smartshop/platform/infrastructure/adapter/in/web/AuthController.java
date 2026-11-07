@@ -155,3 +155,4 @@ public class AuthController {
         return ResponseEntity.ok(oidcTokenService.getPublicJwkSet());
     }
 }
+

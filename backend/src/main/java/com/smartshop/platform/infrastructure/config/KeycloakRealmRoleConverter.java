@@ -37,3 +37,4 @@ public class KeycloakRealmRoleConverter implements Converter<Jwt, Collection<Gra
         return authorities;
     }
 }
+
