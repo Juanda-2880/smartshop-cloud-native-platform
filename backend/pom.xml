@@ -15,7 +15,7 @@
     <artifactId>smartshop-backend</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <name>smartshop-backend</name>
-    <description>SmartShop Cloud-Native Platform Backend (Java 21 + Spring Boot 3.5 + Hexagonal Architecture + PostgreSQL 17 + Flyway)</description>
+    <description>SmartShop Cloud-Native Platform Backend (Java 21 + Spring Boot 3.5 + Hexagonal + PostgreSQL 17 + Keycloak 26 OIDC)</description>
 
     <properties>
         <java.version>21</java.version>
@@ -33,6 +33,14 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -84,6 +92,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
