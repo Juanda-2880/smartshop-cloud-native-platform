@@ -1,0 +1,15 @@
+=== SNAPSHOT 03: CONTROLLED TRAFFIC SWITCH (BLUE -> GREEN) ===
+
+$ kubectl set selector service smartshop-active-service "app=smartshop-app,slot=green" -n smartshop-rollouts
+service/smartshop-active-service selector updated
+
+$ kubectl get svc smartshop-active-service -n smartshop-rollouts -o wide
+NAME                       TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE    SELECTOR
+smartshop-active-service   ClusterIP   10.97.35.72   <none>        80/TCP    2m3s   app=smartshop-app,slot=green
+
+$ kubectl get endpoints smartshop-active-service -n smartshop-rollouts
+NAME                       ENDPOINTS                       AGE
+smartshop-active-service   10.244.0.37:80,10.244.0.39:80   2m3s
+
+$ kubectl exec -n smartshop-rollouts deploy/smartshop-app-blue -- wget -qO- http://smartshop-active-service.smartshop-rollouts.svc.cluster.local/
+{"service":"smartshop-platform","slot":"green","version":"2.0.0-green","channel":"candidate","features":["ai-recommendations","instant-checkout"],"status":"UP"}

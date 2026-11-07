@@ -1,0 +1,13 @@
+=== SNAPSHOT 02: GREEN ACTIVE IN PREVIEW (CANDIDATE VERSION 2.0.0-green) ===
+
+$ kubectl get pods -n smartshop-rollouts -l slot=green -o wide
+NAME                                       READY   STATUS    RESTARTS   AGE   IP            NODE
+pod/smartshop-app-green-665b684656-gt8w6   1/1     Running   0          2m    10.244.0.39   minikube
+pod/smartshop-app-green-665b684656-rskf6   1/1     Running   0          2m    10.244.0.37   minikube
+
+$ kubectl get svc smartshop-preview-service -n smartshop-rollouts -o wide
+NAME                        TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE   SELECTOR
+smartshop-preview-service   ClusterIP   10.101.243.69   <none>        80/TCP    2m    app=smartshop-app,slot=green
+
+$ kubectl exec -n smartshop-rollouts deploy/smartshop-app-blue -- wget -qO- http://smartshop-preview-service.smartshop-rollouts.svc.cluster.local/
+{"service":"smartshop-platform","slot":"green","version":"2.0.0-green","channel":"candidate","features":["ai-recommendations","instant-checkout"],"status":"UP"}

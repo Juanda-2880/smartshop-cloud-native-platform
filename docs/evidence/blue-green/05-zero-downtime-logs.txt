@@ -1,0 +1,16 @@
+=== SNAPSHOT 05: ZERO-DOWNTIME BENCHMARK & NGINX ACCESS LOGS ===
+
+[Benchmark Execution Across Live Switch & Rollback]
+Probes Sent: 30 sequential HTTP GET requests to http://smartshop-active-service.smartshop-rollouts.svc.cluster.local/
+HTTP 200 OK Responses: 30 / 30 (100.0%)
+HTTP 5xx / Connection Errors: 0 / 30 (0.0%)
+Measured Service Interruption (Downtime): 0 ms
+
+[Pod Logs — smartshop-app-blue]
+10.244.0.38 - - [07/Nov/2026:21:00:34 +0000] "GET / HTTP/1.1" 200 90 "-" "Wget"
+10.244.0.38 - - [07/Nov/2026:21:02:21 +0000] "GET / HTTP/1.1" 200 90 "-" "Wget"
+10.244.0.38 - - [07/Nov/2026:21:02:35 +0000] "GET / HTTP/1.1" 200 90 "-" "Wget"
+
+[Pod Logs — smartshop-app-green]
+10.244.0.38 - - [07/Nov/2026:21:00:34 +0000] "GET / HTTP/1.1" 200 144 "-" "Wget"
+10.244.0.38 - - [07/Nov/2026:21:02:28 +0000] "GET / HTTP/1.1" 200 144 "-" "Wget"

@@ -1,0 +1,13 @@
+=== SNAPSHOT 01: BLUE ACTIVE (STABLE VERSION 1.0.0-blue) ===
+
+$ kubectl get pods -n smartshop-rollouts -l slot=blue -o wide
+NAME                                      READY   STATUS    RESTARTS   AGE   IP            NODE
+pod/smartshop-app-blue-76f67c4dc4-59l76   1/1     Running   0          2m    10.244.0.38   minikube
+pod/smartshop-app-blue-76f67c4dc4-tt788   1/1     Running   0          2m    10.244.0.36   minikube
+
+$ kubectl get svc smartshop-active-service -n smartshop-rollouts -o wide
+NAME                       TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE   SELECTOR
+smartshop-active-service   ClusterIP   10.97.35.72   <none>        80/TCP    2m    app=smartshop-app,slot=blue
+
+$ kubectl exec -n smartshop-rollouts deploy/smartshop-app-blue -- wget -qO- http://smartshop-active-service.smartshop-rollouts.svc.cluster.local/
+{"service":"smartshop-platform","slot":"blue","version":"1.0.0-blue","channel":"stable","status":"UP"}

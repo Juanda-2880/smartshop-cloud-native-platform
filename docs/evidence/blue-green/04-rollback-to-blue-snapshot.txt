@@ -1,0 +1,15 @@
+=== SNAPSHOT 04: IMMEDIATE ATOMIC ROLLBACK (GREEN -> BLUE) ===
+
+$ kubectl set selector service smartshop-active-service "app=smartshop-app,slot=blue" -n smartshop-rollouts
+service/smartshop-active-service selector updated
+
+$ kubectl get svc smartshop-active-service -n smartshop-rollouts -o wide
+NAME                       TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE    SELECTOR
+smartshop-active-service   ClusterIP   10.97.35.72   <none>        80/TCP    2m5s   app=smartshop-app,slot=blue
+
+$ kubectl get endpoints smartshop-active-service -n smartshop-rollouts
+NAME                       ENDPOINTS                       AGE
+smartshop-active-service   10.244.0.36:80,10.244.0.38:80   2m5s
+
+$ kubectl exec -n smartshop-rollouts deploy/smartshop-app-blue -- wget -qO- http://smartshop-active-service.smartshop-rollouts.svc.cluster.local/
+{"service":"smartshop-platform","slot":"blue","version":"1.0.0-blue","channel":"stable","status":"UP"}
