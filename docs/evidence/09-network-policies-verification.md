@@ -59,3 +59,4 @@ postgres-ingress-policy           app=smartshop-postgres   5s
 - [x] ✅ Tráfico permitido funciona (`ingress-nginx → frontend/backend`, `frontend → backend:8080`, `backend → postgres:5432`)
 - [x] ✅ Tráfico no permitido bloqueado (`frontend → postgres:5432` bloqueado con `verdict="drop"` y `Operation timed out`)
 - [x] ✅ Evidencia documentada (`docs/evidence/09-network-policies-verification.md`)
+
