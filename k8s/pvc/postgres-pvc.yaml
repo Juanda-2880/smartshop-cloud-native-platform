@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: smartshop-postgres-pvc
+  namespace: smartshop
+  labels:
+    app: smartshop-postgres
+    app.kubernetes.io/name: smartshop-postgres-pvc
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/part-of: smartshop-platform
+spec:
+  storageClassName: standard
+  volumeName: smartshop-postgres-pv
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  selector:
+    matchLabels:
+      app: smartshop-postgres
+      type: local
+
