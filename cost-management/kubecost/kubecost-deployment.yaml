@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smartshop-kubecost
+  namespace: smartshop-finops
+  labels:
+    app: smartshop-kubecost
+    app.kubernetes.io/name: smartshop-kubecost
+    app.kubernetes.io/component: finops
+    app.kubernetes.io/part-of: smartshop-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smartshop-kubecost
+  template:
+    metadata:
+      labels:
+        app: smartshop-kubecost
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "9090"
+    spec:
+      serviceAccountName: smartshop-kubecost
+      containers:
+        - name: kubecost-cost-model
+          image: node:24-alpine
+          imagePullPolicy: IfNotPresent
+          command: ["node", "/app/server.mjs"]
+          env:
+            - name: PROMETHEUS_SERVER_ENDPOINT
+              value: "http://smartshop-prometheus.smartshop-observability.svc.cluster.local:9090"
+          ports:
+            - containerPort: 9090
+              name: http-ui
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 9090
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 9090
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          volumeMounts:
+            - name: finops-engine
+              mountPath: /app
+      volumes:
+        - name: finops-engine
+          configMap:
+            name: kubecost-finops-engine
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smartshop-kubecost
+  namespace: smartshop-finops
+  labels:
+    app: smartshop-kubecost
+    app.kubernetes.io/part-of: smartshop-platform
+spec:
+  type: ClusterIP
+  selector:
+    app: smartshop-kubecost
+  ports:
+    - name: http-ui
+      port: 9090
+      targetPort: 9090
