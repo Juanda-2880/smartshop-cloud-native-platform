@@ -23,3 +23,4 @@ Se diseñó e implementó la interfaz completa de **SmartShop Cloud-Native Platf
 | **Dark Mode (+ Light Mode)** | Conmutador en vivo en `PlatformHeader` con variables semánticas y contraste WCAG AA | ✅ |
 | **Animaciones** | Transiciones de página, `layoutId` pills, barras de telemetría y microinteracciones con Framer Motion | ✅ |
 | **Lighthouse > 90** | Code-splitting en `vite.config.ts` (`react-vendor`, `motion-vendor`, `icons-vendor`), imágenes `loading="lazy"`, semántica HTML5 y ARIA completa | ✅ |
+

@@ -127,3 +127,4 @@ public class ProductJpaEntity {
         return createdAt;
     }
 }
+

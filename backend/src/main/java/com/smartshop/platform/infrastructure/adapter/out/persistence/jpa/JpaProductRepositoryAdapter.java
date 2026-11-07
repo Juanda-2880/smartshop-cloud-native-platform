@@ -84,3 +84,4 @@ public class JpaProductRepositoryAdapter implements ProductRepositoryPort {
         );
     }
 }
+

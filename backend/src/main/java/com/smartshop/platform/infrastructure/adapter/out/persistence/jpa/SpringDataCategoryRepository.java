@@ -8,3 +8,4 @@ public interface SpringDataCategoryRepository extends JpaRepository<CategoryJpaE
 
     Optional<CategoryJpaEntity> findBySlugIgnoreCase(String slug);
 }
+

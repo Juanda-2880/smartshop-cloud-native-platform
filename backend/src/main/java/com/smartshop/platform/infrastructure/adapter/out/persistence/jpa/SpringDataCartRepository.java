@@ -8,3 +8,4 @@ public interface SpringDataCartRepository extends JpaRepository<CartJpaEntity, U
 
     Optional<CartJpaEntity> findByUserId(UUID userId);
 }
+

@@ -20,3 +20,4 @@ services:
 volumes:
   smartshop_pgdata:
     name: smartshop_pgdata
+

@@ -21,3 +21,4 @@ Se implementó la capa de persistencia relacional para **SmartShop Cloud-Native 
 | **Base conectada** | `DataSource` validado (`connection.isValid(2) == true`) y `/actuator/health` reporta `components.db.status = "UP"` | ✅ |
 | **Migraciones ejecutadas** | Flyway ejecuta `V1__create_ecommerce_schema.sql` y `V2__seed_enterprise_catalog.sql` (`flyway.info().applied().length >= 2`) y Hibernate valida el esquema (`ddl-auto: validate`) | ✅ |
 | **Datos persistentes** | Almacenamiento persistente en disco y ciclo CRUD + Checkout verificado en `SmartShopApplicationTests` (`7/7` tests en verde) | ✅ |
+

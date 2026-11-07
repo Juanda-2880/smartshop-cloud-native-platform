@@ -30,3 +30,4 @@ INSERT INTO orders (id, order_number, user_id, total_amount, status, shipping_ad
 
 INSERT INTO order_items (id, order_id, product_id, product_name, sku, unit_price, quantity, subtotal) VALUES
 ('dddddddd-dddd-dddd-dddd-ddddddddddd2', 'dddddddd-dddd-dddd-dddd-ddddddddddd1', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1', 'SmartShop KubeBlade X1 Edge Server', 'SKU-K8S-BLADE-01', 1499.00, 1, 1499.00);
+

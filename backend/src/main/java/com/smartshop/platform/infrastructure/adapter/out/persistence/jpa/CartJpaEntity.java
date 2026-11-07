@@ -71,3 +71,4 @@ public class CartJpaEntity {
         return updatedAt;
     }
 }
+

@@ -11,3 +11,4 @@ public interface SpringDataProductRepository extends JpaRepository<ProductJpaEnt
 
     Optional<ProductJpaEntity> findBySkuIgnoreCase(String sku);
 }
+

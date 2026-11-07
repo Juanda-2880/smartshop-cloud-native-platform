@@ -8,3 +8,4 @@ public interface SpringDataOrderRepository extends JpaRepository<OrderJpaEntity,
 
     List<OrderJpaEntity> findByUserId(UUID userId);
 }
+

@@ -65,3 +65,4 @@ public class JpaCategoryRepositoryAdapter implements CategoryRepositoryPort {
         );
     }
 }
+
