@@ -20,3 +20,4 @@ public interface CartUseCase {
 
     void deleteCart(UUID id);
 }
+

@@ -12,3 +12,4 @@ public record OrderItem(
         BigDecimal subtotal
 ) {
 }
+

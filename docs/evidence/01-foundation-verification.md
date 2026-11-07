@@ -24,3 +24,4 @@ Se construyó la base fundacional de **SmartShop Cloud-Native Platform** cumplie
 - `0399c0e` — `chore(foundation): configure root gitignore and prettier formatting rules`
 - `aa1299a` — `feat(frontend): initialize react 19 vite 7 typescript foundation with eslint and prettier`
 - `4c4ae46` — `feat(backend): initialize spring boot 3.5 java 21 hexagonal project foundation`
+

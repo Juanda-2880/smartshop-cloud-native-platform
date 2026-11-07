@@ -21,3 +21,4 @@ public interface ProductRepositoryPort {
 
     boolean existsById(UUID id);
 }
+

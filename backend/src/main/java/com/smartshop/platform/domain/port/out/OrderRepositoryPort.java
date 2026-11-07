@@ -19,3 +19,4 @@ public interface OrderRepositoryPort {
 
     boolean existsById(UUID id);
 }
+

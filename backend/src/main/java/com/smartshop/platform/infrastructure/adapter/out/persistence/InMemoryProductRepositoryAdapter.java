@@ -121,3 +121,4 @@ public class InMemoryProductRepositoryAdapter implements ProductRepositoryPort {
         return storage.containsKey(id);
     }
 }
+

@@ -30,3 +30,4 @@ Se implementó el backend e-commerce completo en `backend/` utilizando **Java 21
 | **OpenAPI funcional** | Especificación generada en `/v3/api-docs` e interfaz interactiva en `/swagger-ui/index.html` | ✅ |
 | **Health Check funcional** | `/actuator/health`, `/actuator/health/liveness` y `/actuator/health/readiness` respondiendo `{"status":"UP"}` | ✅ |
 | **Tests exitosos** | Tests unitarios (`HexagonalDomainServiceUnitTests`) y de integración (`SmartShopApplicationTests`) ejecutados con `0` fallos | ✅ |
+

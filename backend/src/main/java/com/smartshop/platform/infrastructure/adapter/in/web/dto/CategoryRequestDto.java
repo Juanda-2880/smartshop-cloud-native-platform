@@ -21,3 +21,4 @@ public record CategoryRequestDto(
         boolean active
 ) {
 }
+

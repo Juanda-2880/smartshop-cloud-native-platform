@@ -86,3 +86,4 @@ public class UserService implements UserUseCase {
         businessMetricsPort.updateActiveUsersCount(activeCount);
     }
 }
+

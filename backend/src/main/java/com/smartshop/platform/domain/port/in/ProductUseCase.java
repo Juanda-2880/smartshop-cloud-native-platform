@@ -18,3 +18,4 @@ public interface ProductUseCase {
 
     void deleteProduct(UUID id);
 }
+

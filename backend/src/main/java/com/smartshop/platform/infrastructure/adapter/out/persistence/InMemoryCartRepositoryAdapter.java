@@ -70,3 +70,4 @@ public class InMemoryCartRepositoryAdapter implements CartRepositoryPort {
         return storage.containsKey(id);
     }
 }
+

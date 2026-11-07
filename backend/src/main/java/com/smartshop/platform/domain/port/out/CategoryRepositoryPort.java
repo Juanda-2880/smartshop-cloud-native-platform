@@ -19,3 +19,4 @@ public interface CategoryRepositoryPort {
 
     boolean existsById(UUID id);
 }
+

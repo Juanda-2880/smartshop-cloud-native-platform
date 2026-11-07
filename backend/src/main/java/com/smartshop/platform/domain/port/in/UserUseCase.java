@@ -16,3 +16,4 @@ public interface UserUseCase {
 
     void deleteUser(UUID id);
 }
+

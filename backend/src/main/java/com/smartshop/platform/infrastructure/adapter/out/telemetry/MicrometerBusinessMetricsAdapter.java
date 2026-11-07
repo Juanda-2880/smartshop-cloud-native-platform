@@ -63,3 +63,4 @@ public class MicrometerBusinessMetricsAdapter implements BusinessMetricsPort {
         return (ordersCompletedCounter.count() / visits) * 100.0;
     }
 }
+

@@ -10,3 +10,4 @@ public interface BusinessMetricsPort {
 
     void updateActiveUsersCount(long activeUsersCount);
 }
+

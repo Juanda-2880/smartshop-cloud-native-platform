@@ -102,3 +102,4 @@ class HexagonalDomainServiceUnitTests {
         assertThat(clearedCart.totalAmount()).isEqualByComparingTo(BigDecimal.ZERO);
     }
 }
+

@@ -60,3 +60,4 @@ public class InMemoryUserRepositoryAdapter implements UserRepositoryPort {
         return storage.containsKey(id);
     }
 }
+

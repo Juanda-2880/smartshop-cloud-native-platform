@@ -59,3 +59,4 @@ public class InMemoryCategoryRepositoryAdapter implements CategoryRepositoryPort
         return storage.containsKey(id);
     }
 }
+

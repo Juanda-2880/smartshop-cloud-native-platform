@@ -15,3 +15,4 @@ public class WebCorsConfiguration implements WebMvcConfigurer {
                 .allowedHeaders("*");
     }
 }
+

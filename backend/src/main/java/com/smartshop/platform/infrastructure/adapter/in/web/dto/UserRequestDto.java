@@ -29,3 +29,4 @@ public record UserRequestDto(
         boolean active
 ) {
 }
+

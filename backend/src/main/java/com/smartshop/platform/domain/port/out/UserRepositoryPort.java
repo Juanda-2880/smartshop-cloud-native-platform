@@ -19,3 +19,4 @@ public interface UserRepositoryPort {
 
     boolean existsById(UUID id);
 }
+

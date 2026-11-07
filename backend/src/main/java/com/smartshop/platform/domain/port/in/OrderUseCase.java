@@ -21,3 +21,4 @@ public interface OrderUseCase {
 
     void deleteOrder(UUID id);
 }
+

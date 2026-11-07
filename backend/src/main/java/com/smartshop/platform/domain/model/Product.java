@@ -19,3 +19,4 @@ public record Product(
         Instant createdAt
 ) {
 }
+

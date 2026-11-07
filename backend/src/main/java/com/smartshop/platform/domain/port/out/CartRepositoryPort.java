@@ -19,3 +19,4 @@ public interface CartRepositoryPort {
 
     boolean existsById(UUID id);
 }
+

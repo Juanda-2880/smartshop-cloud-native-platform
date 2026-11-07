@@ -16,3 +16,4 @@ public interface CategoryUseCase {
 
     void deleteCategory(UUID id);
 }
+

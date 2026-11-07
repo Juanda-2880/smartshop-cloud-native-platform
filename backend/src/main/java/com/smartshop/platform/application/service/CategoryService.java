@@ -65,3 +65,4 @@ public class CategoryService implements CategoryUseCase {
         categoryRepositoryPort.deleteById(id);
     }
 }
+

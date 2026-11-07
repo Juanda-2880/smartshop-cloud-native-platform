@@ -46,3 +46,4 @@ public record ProductRequestDto(
         boolean active
 ) {
 }
+
