@@ -1,8 +1,14 @@
-# Estrategia Empresarial de Despliegue Blue-Green & Progressive Delivery — SmartShop Cloud-Native Platform
+# Estrategia Empresarial de Despliegue Blue-Green & Progressive Delivery — Documentación Técnica
 
-## 1. Diagramas de Arquitectura y Flujo de Conmutación
+## 1. Qué es
+**Blue-Green Deployment** es una estrategia avanzada de entrega progresiva (*Progressive Delivery*) que mantiene dos entornos de producción idénticos de forma simultánea: **Blue** (versión estable activa `1.0.0-blue`) y **Green** (versión candidata `2.0.0-green`), permitiendo conmutar el 100% del tráfico de forma instantánea y revertir (*rollback*) sin tiempo de inactividad (**Zero Downtime**).
 
-### 1.1 Topología Blue-Green en Kubernetes (`smartshop-rollouts`)
+## 2. Para qué sirve
+Sirve para eliminar el riesgo técnico y comercial durante el lanzamiento de nuevas versiones de **SmartShop**, permitiendo validar la versión candidata (`Green`) en un endpoint de pre-promoción (`smartshop-preview-service`) antes de conmutar el servicio productivo (`smartshop-active-service`) y garantizando un **MTTR < 2 segundos** en caso de rollback.
+
+## 3. Arquitectura
+
+### 3.1 Topología Blue-Green en Kubernetes (`smartshop-rollouts`)
 ```mermaid
 flowchart LR
     Users["Clientes / Tráfico Productivo"] --> Ingress["NGINX Ingress Controller\n(rollout.smartshop.local)"]
@@ -26,7 +32,7 @@ flowchart LR
     PreviewSvc ==>|"Validación Pre-Switch"| GreenEnv
 ```
 
-### 1.2 Secuencia de Promoción (Switch) y Rollback Instantáneo
+### 3.2 Secuencia de Promoción (Switch) y Rollback Instantáneo
 ```mermaid
 sequenceDiagram
     autonumber
@@ -51,66 +57,39 @@ sequenceDiagram
     Svc->>Blue: 100% Tráfico restaurado instantáneamente a 1.0.0-blue
 ```
 
----
+## 4. Configuración
+Los manifiestos declarativos se ubican en [`rollout/`](file:///c:/Users/juand/Documents/Plataformas%20II/SmartShop/smartshop-cloud-native-platform/rollout/):
+- **Entorno Estable Blue (`1.0.0-blue`)**: [`rollout/blue-green/blue-deployment.yaml`](file:///c:/Users/juand/Documents/Plataformas%20II/SmartShop/smartshop-cloud-native-platform/rollout/blue-green/blue-deployment.yaml)
+- **Entorno Candidato Green (`2.0.0-green`)**: [`rollout/blue-green/green-deployment.yaml`](file:///c:/Users/juand/Documents/Plataformas%20II/SmartShop/smartshop-cloud-native-platform/rollout/blue-green/green-deployment.yaml)
+- **Servicios Activo/Preview e Ingress**: [`rollout/blue-green/services-and-ingress.yaml`](file:///c:/Users/juand/Documents/Plataformas%20II/SmartShop/smartshop-cloud-native-platform/rollout/blue-green/services-and-ingress.yaml)
+- **Estrategias Complementarias (Canary, Shadow, Feature Flags)**: [`rollout/argo-rollouts/argo-rollout-strategies.yaml`](file:///c:/Users/juand/Documents/Plataformas%20II/SmartShop/smartshop-cloud-native-platform/rollout/argo-rollouts/argo-rollout-strategies.yaml)
+- **Especificaciones Argo Rollouts CRD (`Rollout`)**: [`rollout/argo-rollouts/argo-rollout-crd-spec.yaml`](file:///c:/Users/juand/Documents/Plataformas%20II/SmartShop/smartshop-cloud-native-platform/rollout/argo-rollouts/argo-rollout-crd-spec.yaml)
 
-## 2. Explicación Técnica
+## 5. Parámetros usados
 
-### 2.1 Arquitectura del Mecanismo Blue-Green
-En Kubernetes, la estrategia **Blue-Green Deployment** desacopla el ciclo de vida del aprovisionamiento de contenedores (`Deployment` / `ReplicaSet`) de la conmutación del plano de datos (`Service` / `EndpointSlice`):
-1. **Entorno Blue (`smartshop-app-blue`, `version: 1.0.0-blue`)**: Mantiene 2 réplicas activas (`10.244.0.36`, `10.244.0.38`) atendiendo el tráfico productivo a través de `smartshop-active-service`.
-2. **Entorno Green (`smartshop-app-green`, `version: 2.0.0-green`)**: Se despliega en paralelo con 2 réplicas (`10.244.0.37`, `10.244.0.39`). Mientras sus contenedores arrancan y superan las sondas `readinessProbe` (`GET /healthz`), **ningún usuario productivo se ve afectado**.
-3. **Validación en Caliente (`smartshop-preview-service`)**: Antes de conmutar producción, el servicio `smartshop-preview-service` (`selector: slot=green`) permite ejecutar pruebas funcionales y de contrato contra la versión `2.0.0-green`.
-4. **Conmutación Atómica (Switch `Blue -> Green`)**: Al actualizar el selector de `smartshop-active-service` a `slot=green`, el controlador de `EndpointSlice` y `kube-proxy` actualizan atómicamente las reglas de enrutamiento hacia los pods Green que ya están pre-calentados (`1/1 Running`), logrando **0 ms de tiempo de inactividad (Zero Downtime)**.
-5. **Rollback Inmediato (`Green -> Blue`)**: Dado que las réplicas de `smartshop-app-blue` permanecen en ejecución durante la ventana de observación (`scaleDownDelaySeconds`), revertir ante cualquier anomalía toma menos de 1 segundo volviendo a apuntar `smartshop-active-service` a `slot=blue`.
+| Parámetro / Recurso | Valor Configurado | Propósito |
+| :--- | :--- | :--- |
+| `activeService` | `smartshop-active-service` | Servicio productivo cuyo selector conmuta entre `slot: blue` y `slot: green`. |
+| `previewService` | `smartshop-preview-service` | Servicio de pre-producción fijo en `slot: green` para pruebas pre-switch. |
+| `autoPromotionEnabled` | `false` | Requiere verificación explícita de salud antes de promover `Green` a producción. |
+| `scaleDownDelaySeconds` | `30s` | Mantiene el entorno `Blue` pre-calentado tras el switch para garantizar rollback instantáneo. |
+| `Canary Weight / Shadow` | `canary-weight: "20"` / `mirror-target` | Soporte adicional para despliegues Canary graduales y duplicación de tráfico Shadow. |
 
-### 2.2 Catálogo Completo de Estrategias Soportadas (`rollout/`)
-Además de **Blue-Green**, el directorio `rollout/` implementa:
-- **Argo Rollouts Blue-Green & Canary** (`rollout/argo-rollouts/argo-rollout-crd-spec.yaml`): Especificación declarativa `argoproj.io/v1alpha1` con `autoPromotionEnabled: false` y pasos graduales `setWeight: 20 -> 50 -> 100`.
-- **Canary Traffic Splitting** (`rollout/argo-rollouts/argo-rollout-strategies.yaml`): Enrutamiento porcentual (`canary-weight: "20"`) y por cabecera (`X-Canary`).
-- **Shadow / Dark Launch Mirroring** (`smartshop-shadow-ingress`): Duplicación asíncrona del tráfico real hacia `smartshop-green-service` (`mirror-target`) sin impactar la respuesta del cliente.
-- **RollingUpdate & Recreate**: Configurados en `smartshop-backend`/`smartshop-frontend` (`RollingUpdate`) y `smartshop-postgres` (`Recreate` para volúmenes RWO).
-- **Feature Flags** (`smartshop-feature-flags`): Conmutación de funcionalidades (`aiRecommendationsEnabled`, `instantOneClickCheckout`) en caliente sin redespliegue.
+## 6. Beneficios (Explicación Técnica y de Negocio)
+- **Cero tiempo de inactividad (*Zero Downtime*)**: Verificado con 30 peticiones consecutivas durante el switch y el rollback con `100%` respuestas `HTTP 200 OK` y `0 ms` de corte.
+- **Continuidad de ingresos E-Commerce**: Ningún carrito de compra ni transacción de pago se interrumpe durante una actualización de versión.
+- **Rollback atómico en menos de 2 segundos**: Reduce drásticamente el tiempo medio de recuperación (*MTTR*) ante cualquier incidente funcional o de rendimiento.
 
----
+## 7. Riesgos
+- **Duplicación temporal de recursos de cómputo**: Durante la ventana de transición coexisten las réplicas de `Blue` y `Green`, requiriendo capacidad de CPU/RAM suficiente en el clúster.
+- **Compatibilidad de esquema de base de datos (*N-1 Compatibility*)**: Las migraciones Flyway en PostgreSQL deben ser compatibles hacia atrás (*expand-and-contract*) para que tanto `Blue` como `Green` operen sin conflicto.
 
-## 3. Explicación de Negocio
-
-| Dimensión de Negocio | Impacto Cuantificable en SmartShop E-Commerce |
-| :--- | :--- |
-| **Continuidad de Ingresos (Zero Downtime)** | Elimina las ventanas de mantenimiento nocturnas. El 100% de los carritos de compra y pagos activos continúan procesándose durante los lanzamientos (`0` errores HTTP `5xx`). |
-| **Mitigación de Riesgo Financiero (MTTR < 2s)** | En caso de detectarse una regresión en el embudo de conversión (`smartshop_conversion_rate`), el rollback a la versión estable `Blue` es inmediato (< 2 segundos), frente a los 10–25 minutos de una reconstrucción tradicional. |
-| **Validación en Producción sin Exposición al Cliente** | El endpoint `/preview` y el mirroring `Shadow` permiten al equipo de Producto validar nuevas funcionalidades (`ai-recommendations`, `instant-checkout`) con infraestructura real antes de abrir el tráfico general. |
-| **Velocidad de Lanzamiento (Time-to-Market)** | Permite pasar de despliegues mensuales riesgosos a múltiples despliegues diarios bajo control automatizado de SLOs en Prometheus y Alertmanager. |
-
----
-
-## 4. Evidencias, Capturas y Logs de Ejecución en Vivo
-
-Todos los archivos de evidencia cruda se encuentran almacenados en [`docs/evidence/blue-green/`](file:///c:/Users/juand/Documents/Plataformas%20II/SmartShop/smartshop-cloud-native-platform/docs/evidence/blue-green/):
-
-1. **Estado 1 — Blue Activa (`1.0.0-blue`)** (`01-blue-active-snapshot.txt`):
-   ```json
-   {"service":"smartshop-platform","slot":"blue","version":"1.0.0-blue","channel":"stable","status":"UP"}
-   ```
-2. **Estado 2 — Green Activa en Preview (`2.0.0-green`)** (`02-green-active-snapshot.txt`):
-   ```json
-   {"service":"smartshop-platform","slot":"green","version":"2.0.0-green","channel":"candidate","features":["ai-recommendations","instant-checkout"],"status":"UP"}
-   ```
-3. **Estado 3 — Switch Controlado (`Blue -> Green`)** (`03-switch-to-green-snapshot.txt`):
-   ```text
-   service/smartshop-active-service selector updated (app=smartshop-app,slot=green)
-   {"service":"smartshop-platform","slot":"green","version":"2.0.0-green","channel":"candidate","features":["ai-recommendations","instant-checkout"],"status":"UP"}
-   ```
-4. **Estado 4 — Rollback Inmediato (`Green -> Blue`)** (`04-rollback-to-blue-snapshot.txt`):
-   ```text
-   service/smartshop-active-service selector updated (app=smartshop-app,slot=blue)
-   {"service":"smartshop-platform","slot":"blue","version":"1.0.0-blue","channel":"stable","status":"UP"}
-   ```
-5. **Estado 5 — Benchmark de Cero Downtime & Logs** (`05-zero-downtime-logs.txt`):
-   ```text
-   Probes Sent: 30 sequential HTTP GET requests to http://smartshop-active-service.smartshop-rollouts.svc.cluster.local/
-   HTTP 200 OK Responses: 30 / 30 (100.0%)
-   HTTP 5xx / Connection Errors: 0 / 30 (0.0%)
-   Measured Service Interruption (Downtime): 0 ms
-   ```
-
+## 8. Buenas prácticas y Evidencias Capturadas
+- Verificar siempre el endpoint `/healthz` y `/preview` antes de ejecutar la promoción de `smartshop-active-service`.
+- Realizar migraciones de base de datos aditivas y no destructivas para permitir rollbacks limpios en cualquier instante.
+- **Evidencias verificadas en [`docs/evidence/blue-green/`](file:///c:/Users/juand/Documents/Plataformas%20II/SmartShop/smartshop-cloud-native-platform/docs/evidence/blue-green/)**:
+  1. [`01-blue-active-snapshot.txt`](file:///c:/Users/juand/Documents/Plataformas%20II/SmartShop/smartshop-cloud-native-platform/docs/evidence/blue-green/01-blue-active-snapshot.txt) (`slot=blue`, `version=1.0.0-blue`)
+  2. [`02-green-active-snapshot.txt`](file:///c:/Users/juand/Documents/Plataformas%20II/SmartShop/smartshop-cloud-native-platform/docs/evidence/blue-green/02-green-active-snapshot.txt) (`slot=green`, `version=2.0.0-green`)
+  3. [`03-switch-to-green-snapshot.txt`](file:///c:/Users/juand/Documents/Plataformas%20II/SmartShop/smartshop-cloud-native-platform/docs/evidence/blue-green/03-switch-to-green-snapshot.txt) (Switch controlado `Blue -> Green`)
+  4. [`04-rollback-to-blue-snapshot.txt`](file:///c:/Users/juand/Documents/Plataformas%20II/SmartShop/smartshop-cloud-native-platform/docs/evidence/blue-green/04-rollback-to-blue-snapshot.txt) (Rollback atómico `Green -> Blue`)
+  5. [`05-zero-downtime-logs.txt`](file:///c:/Users/juand/Documents/Plataformas%20II/SmartShop/smartshop-cloud-native-platform/docs/evidence/blue-green/05-zero-downtime-logs.txt) (`30/30 HTTP 200 OK`, `0 ms` downtime)
