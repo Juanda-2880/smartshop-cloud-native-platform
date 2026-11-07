@@ -63,3 +63,4 @@ smartshop-elk-business-dashboard   SmartShop ELK — 04 Negocio, Catálogo, Carr
 - [x] ✅ Logs capturados (`backend`, `frontend`, `kubernetes` desde `/var/log/pods`)
 - [x] ✅ Logs indexados (`smartshop-logs-backend-*`, `smartshop-logs-frontend-*`, `smartshop-logs-kubernetes-*`)
 - [x] ✅ Kibana funcional (`smartshop-kibana:5601` operativo con los 4 dashboards importados)
+
