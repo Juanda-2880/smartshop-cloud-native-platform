@@ -61,6 +61,64 @@ class SmartShopApplicationTests {
     }
 
     @Test
+    void keycloakOidcSsoLoginLogoutRolesAndProtectedApisShouldWork() throws Exception {
+        // 1. Unauthenticated requests to protected APIs must return 401 Unauthorized
+        mockMvc.perform(get("/api/v1/auth/me"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/v1/auth/rbac/admin"))
+                .andExpect(status().isUnauthorized());
+
+        // 2. Login as ADMIN, MANAGER, and CUSTOMER
+        String adminToken = loginAndExtractToken("admin@smartshop.io");
+        String managerToken = loginAndExtractToken("manager@smartshop.io");
+        String customerToken = loginAndExtractToken("customer@smartshop.io");
+
+        // 3. Verify /api/v1/auth/me returns OIDC claims
+        mockMvc.perform(get("/api/v1/auth/me")
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("admin@smartshop.io"));
+
+        // 4. Verify RBAC enforcement for ADMIN (can access admin, manager, customer)
+        mockMvc.perform(get("/api/v1/auth/rbac/admin")
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.roleVerified").value("ADMIN"));
+
+        // 5. Verify RBAC enforcement for MANAGER (can access manager & customer, forbidden on admin)
+        mockMvc.perform(get("/api/v1/auth/rbac/manager")
+                        .header("Authorization", "Bearer " + managerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.roleVerified").value("MANAGER"));
+        mockMvc.perform(get("/api/v1/auth/rbac/admin")
+                        .header("Authorization", "Bearer " + managerToken))
+                .andExpect(status().isForbidden());
+
+        // 6. Verify RBAC enforcement for CUSTOMER (can access customer, forbidden on manager & admin)
+        mockMvc.perform(get("/api/v1/auth/rbac/customer")
+                        .header("Authorization", "Bearer " + customerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.roleVerified").value("CUSTOMER"));
+        mockMvc.perform(get("/api/v1/auth/rbac/manager")
+                        .header("Authorization", "Bearer " + customerToken))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/v1/auth/rbac/admin")
+                        .header("Authorization", "Bearer " + customerToken))
+                .andExpect(status().isForbidden());
+
+        // 7. Verify Logout revokes the token and subsequent calls return 401 Unauthorized
+        mockMvc.perform(post("/api/v1/auth/logout")
+                        .header("Authorization", "Bearer " + customerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("LOGGED_OUT"))
+                .andExpect(jsonPath("$.revoked").value(true));
+
+        mockMvc.perform(get("/api/v1/auth/me")
+                        .header("Authorization", "Bearer " + customerToken))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void healthChecksAndOpenApiShouldBeOperational() throws Exception {
         mockMvc.perform(get("/actuator/health/liveness"))
                 .andExpect(status().isOk())
@@ -78,7 +136,8 @@ class SmartShopApplicationTests {
                 .andExpect(jsonPath("$.paths['/api/v1/users']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/categories']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/carts']").exists())
-                .andExpect(jsonPath("$.paths['/api/v1/orders']").exists());
+                .andExpect(jsonPath("$.paths['/api/v1/orders']").exists())
+                .andExpect(jsonPath("$.paths['/api/v1/auth/login']").exists());
 
         mockMvc.perform(get("/swagger-ui/index.html"))
                 .andExpect(status().isOk());
@@ -237,5 +296,24 @@ class SmartShopApplicationTests {
         mockMvc.perform(get("/api/v1/products/" + InMemoryProductRepositoryAdapter.PROD_KUBE_BLADE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.sku").value("SKU-K8S-BLADE-01"));
+    }
+
+    private String loginAndExtractToken(String email) throws Exception {
+        String payload = """
+                {
+                  "usernameOrEmail": "%s",
+                  "password": "SmartShopPassword2026!"
+                }
+                """.formatted(email);
+        MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").exists())
+                .andExpect(jsonPath("$.tokenType").value("Bearer"))
+                .andReturn();
+        return objectMapper.readTree(result.getResponse().getContentAsString())
+                .get("accessToken")
+                .asText();
     }
 }
