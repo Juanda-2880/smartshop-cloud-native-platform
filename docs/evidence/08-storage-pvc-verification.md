@@ -51,3 +51,4 @@ persistentvolumeclaim/smartshop-postgres-pvc   Bound    smartshop-postgres-pv   
 - [x] ✅ Datos persisten (`5` filas conservadas en `categories` tras recrear el pod de PostgreSQL)
 - [x] ✅ Reinicio exitoso (`deployment "smartshop-postgres" successfully rolled out`, pod `1/1 Running`)
 - [x] ✅ PVC Bound (`smartshop-postgres-pvc` en estado `Bound` sobre `smartshop-postgres-pv`)
+
