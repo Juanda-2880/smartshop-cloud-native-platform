@@ -1,0 +1,63 @@
+# ============================================================================
+# SmartShop Cloud-Native Platform - Root .gitignore
+# ============================================================================
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE & Editors
+.idea/
+*.iml
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.project
+.classpath
+.settings/
+*.swp
+*.swo
+
+# Frontend (Node / Vite / React / TypeScript)
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.vite/
+frontend/coverage/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Backend (Java 21 / Spring Boot 3.5 / Maven)
+backend/target/
+backend/log/
+backend/logs/
+*.class
+*.log
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
+!.mvn/wrapper/maven-wrapper.jar
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.crt
+
+# Temporary & Local Runtime Artifacts
+tmp/
+temp/
+.cache/
