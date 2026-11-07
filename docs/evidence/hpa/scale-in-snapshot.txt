@@ -1,0 +1,38 @@
+=== HPA SCALE IN SNAPSHOT (ALL METRICS BELOW TARGET -> RETURN TO MINPODS=2) ===
+
+$ kubectl get hpa -n smartshop -o wide
+NAME                     REFERENCE                       TARGETS                        MINPODS   MAXPODS   REPLICAS   AGE
+smartshop-backend-hpa    Deployment/smartshop-backend    cpu: 2%/70%, memory: 68%/80%   2         10        2          4m32s
+smartshop-frontend-hpa   Deployment/smartshop-frontend   cpu: 2%/70%, memory: 23%/80%   2         10        2          4m32s
+
+$ kubectl top pods -n smartshop -l app=smartshop-frontend
+NAME                                 CPU(cores)   MEMORY(bytes)
+smartshop-frontend-9c7cc894b-2svph   1m           15Mi
+smartshop-frontend-9c7cc894b-m87rr   1m           15Mi
+
+$ kubectl describe hpa smartshop-frontend-hpa -n smartshop
+Name:                                                     smartshop-frontend-hpa
+Namespace:                                                smartshop
+Reference:                                                Deployment/smartshop-frontend
+Metrics:                                                  ( current / target )
+  resource cpu on pods  (as a percentage of request):     2% (1m) / 70%
+  resource memory on pods  (as a percentage of request):  23% (15634Ki) / 80%
+Min replicas:                                             2
+Max replicas:                                             10
+Deployment pods:                                          2 current / 2 desired
+Conditions:
+  Type            Status  Reason            Message
+  ----            ------  ------            -------
+  AbleToScale     True    ReadyForNewScale  recommended size matches current size
+  ScalingActive   True    ValidMetricFound  the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)
+  ScalingLimited  True    TooFewReplicas    the desired replica count is less than the minimum replica count
+  ScaledToZero    False   NotScaledToZero   the HPA controller did not scale the workload to zero
+Events:
+  Type    Reason             Age    From                       Message
+  ----    ------             ----   ----                       -------
+  Normal  SuccessfulRescale  3m18s  horizontal-pod-autoscaler  New size: 6; reason: cpu resource utilization (percentage of request) above target
+  Normal  SuccessfulRescale  3m3s   horizontal-pod-autoscaler  New size: 9; reason: cpu resource utilization (percentage of request) above target
+  Normal  SuccessfulRescale  78s    horizontal-pod-autoscaler  New size: 8; reason: All metrics below target
+  Normal  SuccessfulRescale  63s    horizontal-pod-autoscaler  New size: 7; reason: All metrics below target
+  Normal  SuccessfulRescale  48s    horizontal-pod-autoscaler  New size: 6; reason: All metrics below target
+  Normal  SuccessfulRescale  17s    horizontal-pod-autoscaler  New size: 2; reason: All metrics below target
