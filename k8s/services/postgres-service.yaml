@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: smartshop-postgres
+  namespace: smartshop
+  labels:
+    app: smartshop-postgres
+    app.kubernetes.io/name: smartshop-postgres
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: smartshop-platform
+spec:
+  type: ClusterIP
+  selector:
+    app: smartshop-postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+      protocol: TCP
+

@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: smartshop
+  labels:
+    app.kubernetes.io/part-of: smartshop-platform
+    environment: production
+    tier: core
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: smartshop-observability
+  labels:
+    app.kubernetes.io/part-of: smartshop-platform
+    environment: production
+    tier: observability
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: smartshop-logging
+  labels:
+    app.kubernetes.io/part-of: smartshop-platform
+    environment: production
+    tier: logging
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: smartshop-finops
+  labels:
+    app.kubernetes.io/part-of: smartshop-platform
+    environment: production
+    tier: finops
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: smartshop-rollouts
+  labels:
+    app.kubernetes.io/part-of: smartshop-platform
+    environment: production
+    tier: delivery
+

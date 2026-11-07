@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smartshop-backend
+  namespace: smartshop
+  labels:
+    app: smartshop-backend
+    app.kubernetes.io/name: smartshop-backend
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: smartshop-platform
+    version: v1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: smartshop-backend
+  template:
+    metadata:
+      labels:
+        app: smartshop-backend
+        app.kubernetes.io/name: smartshop-backend
+        app.kubernetes.io/component: backend
+        tier: backend
+        version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8080"
+    spec:
+      containers:
+        - name: backend
+          image: smartshop-backend:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          envFrom:
+            - configMapRef:
+                name: smartshop-config
+            - secretRef:
+                name: smartshop-secret
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "384Mi"
+            limits:
+              cpu: "750m"
+              memory: "768Mi"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 5
+

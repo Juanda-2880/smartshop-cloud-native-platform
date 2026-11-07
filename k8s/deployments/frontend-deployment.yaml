@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smartshop-frontend
+  namespace: smartshop
+  labels:
+    app: smartshop-frontend
+    app.kubernetes.io/name: smartshop-frontend
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/part-of: smartshop-platform
+    version: v1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: smartshop-frontend
+  template:
+    metadata:
+      labels:
+        app: smartshop-frontend
+        app.kubernetes.io/name: smartshop-frontend
+        app.kubernetes.io/component: frontend
+        tier: frontend
+        version: v1
+    spec:
+      containers:
+        - name: frontend
+          image: smartshop-frontend:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: http
+          envFrom:
+            - configMapRef:
+                name: smartshop-config
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "250m"
+              memory: "128Mi"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 3
+

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: smartshop-frontend
+  namespace: smartshop
+  labels:
+    app: smartshop-frontend
+    app.kubernetes.io/name: smartshop-frontend
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/part-of: smartshop-platform
+spec:
+  type: ClusterIP
+  selector:
+    app: smartshop-frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      protocol: TCP
+
