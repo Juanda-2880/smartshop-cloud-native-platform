@@ -1,0 +1,96 @@
+{
+  "uid": "smartshop-app-red",
+  "title": "SmartShop — 03 Application & RED Model (Requests, Latency, Throughput, Error Rate)",
+  "tags": ["smartshop", "application", "red-model"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Total HTTP Requests Processed",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum(http_server_requests_seconds_count{application=\"smartshop-backend\"})",
+          "legendFormat": "Total Requests",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "RED Rate — Throughput (Requests / sec)",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum(rate(http_server_requests_seconds_count{application=\"smartshop-backend\"}[2m]))",
+          "legendFormat": "Throughput (req/s)",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "RED Errors — HTTP Error Rate (%)",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "(sum(rate(http_server_requests_seconds_count{application=\"smartshop-backend\", status=~\"5..\"}[2m])) or vector(0)) / clamp_min(sum(rate(http_server_requests_seconds_count{application=\"smartshop-backend\"}[2m])), 0.0001) * 100",
+          "legendFormat": "Error Rate %",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "RED Duration — Mean Response Latency (ms)",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "(sum(rate(http_server_requests_seconds_sum{application=\"smartshop-backend\"}[2m])) / clamp_min(sum(rate(http_server_requests_seconds_count{application=\"smartshop-backend\"}[2m])), 0.0001)) * 1000",
+          "legendFormat": "Latency (ms)",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "RED Rate: Request Throughput by Endpoint URI",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum by (uri, method, status) (rate(http_server_requests_seconds_count{application=\"smartshop-backend\"}[2m]))",
+          "legendFormat": "{{method}} {{uri}} ({{status}})",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "RED Duration: Max & Mean Latency by Endpoint (ms)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "max by (uri) (http_server_requests_seconds_max{application=\"smartshop-backend\"}) * 1000",
+          "legendFormat": "Max {{uri}} (ms)",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}
+

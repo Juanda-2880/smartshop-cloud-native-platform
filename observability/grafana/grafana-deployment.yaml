@@ -1,0 +1,136 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: smartshop-observability
+  labels:
+    app: smartshop-grafana
+    app.kubernetes.io/part-of: smartshop-platform
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        uid: prometheus
+        access: proxy
+        url: http://smartshop-prometheus.smartshop-observability.svc.cluster.local:9090
+        isDefault: true
+        editable: true
+      - name: Alertmanager
+        type: alertmanager
+        uid: alertmanager
+        access: proxy
+        url: http://smartshop-alertmanager.smartshop-observability.svc.cluster.local:9093
+        jsonData:
+          implementation: prometheus
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-provider
+  namespace: smartshop-observability
+  labels:
+    app: smartshop-grafana
+    app.kubernetes.io/part-of: smartshop-platform
+data:
+  dashboards.yaml: |
+    apiVersion: 1
+    providers:
+      - name: 'SmartShop Dashboards'
+        orgId: 1
+        folder: 'SmartShop Cloud-Native'
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smartshop-grafana
+  namespace: smartshop-observability
+  labels:
+    app: smartshop-grafana
+    app.kubernetes.io/part-of: smartshop-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smartshop-grafana
+  template:
+    metadata:
+      labels:
+        app: smartshop-grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana:11.5.2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              value: "admin"
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: "admin_password"
+            - name: GF_AUTH_ANONYMOUS_ENABLED
+              value: "true"
+            - name: GF_AUTH_ANONYMOUS_ORG_ROLE
+              value: "Viewer"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "300m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          volumeMounts:
+            - name: datasources
+              mountPath: /etc/grafana/provisioning/datasources
+            - name: dashboard-provider
+              mountPath: /etc/grafana/provisioning/dashboards
+            - name: dashboards-json
+              mountPath: /var/lib/grafana/dashboards
+      volumes:
+        - name: datasources
+          configMap:
+            name: grafana-datasources
+        - name: dashboard-provider
+          configMap:
+            name: grafana-dashboard-provider
+        - name: dashboards-json
+          configMap:
+            name: grafana-dashboards-json
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smartshop-grafana
+  namespace: smartshop-observability
+  labels:
+    app: smartshop-grafana
+    app.kubernetes.io/part-of: smartshop-platform
+spec:
+  type: ClusterIP
+  selector:
+    app: smartshop-grafana
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+

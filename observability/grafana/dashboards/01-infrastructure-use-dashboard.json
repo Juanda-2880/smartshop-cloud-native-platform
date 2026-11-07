@@ -1,0 +1,106 @@
+{
+  "uid": "smartshop-infra-use",
+  "title": "SmartShop — 01 Infrastructure & USE Model (CPU, RAM, Disk, Network)",
+  "tags": ["smartshop", "infrastructure", "use-model"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "panels": [
+    {
+      "id": 1,
+      "title": "CPU Utilization % (USE: Utilization)",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "(1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[2m]))) * 100",
+          "legendFormat": "CPU Utilization %",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "RAM Utilization % (USE: Utilization)",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+          "legendFormat": "Memory Utilization %",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Disk Utilization % (USE: Utilization)",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "(1 - (avg(disk_free_bytes) / avg(disk_total_bytes))) * 100",
+          "legendFormat": "Disk Utilization %",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "System Load Saturation (USE: Saturation — 1m Load / Cores)",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "node_load1 / count(node_cpu_seconds_total{mode=\"idle\"})",
+          "legendFormat": "CPU Saturation Ratio",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Network Throughput RX/TX Bytes/sec (USE: Network Utilization)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum(rate(node_network_receive_bytes_total[2m]))",
+          "legendFormat": "Network RX (Bytes/s)",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(node_network_transmit_bytes_total[2m]))",
+          "legendFormat": "Network TX (Bytes/s)",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Network & Disk Errors / Drops (USE: Errors)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum(rate(node_network_receive_errs_total[2m])) + sum(rate(node_network_transmit_errs_total[2m]))",
+          "legendFormat": "Network Interface Errors/s",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(node_network_receive_drop_total[2m])) + sum(rate(node_network_transmit_drop_total[2m]))",
+          "legendFormat": "Network Packet Drops/s",
+          "refId": "B"
+        }
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,105 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: smartshop-observability
+  labels:
+    app: smartshop-alertmanager
+    app.kubernetes.io/part-of: smartshop-platform
+data:
+  alertmanager.yml: |
+    global:
+      resolve_timeout: 5m
+
+    route:
+      group_by: ['alertname', 'category', 'severity']
+      group_wait: 10s
+      group_interval: 30s
+      repeat_interval: 1h
+      receiver: 'smartshop-sre-webhook'
+      routes:
+        - matchers:
+            - severity="critical"
+          receiver: 'smartshop-sre-webhook'
+        - matchers:
+            - category="business"
+          receiver: 'smartshop-sre-webhook'
+
+    receivers:
+      - name: 'smartshop-sre-webhook'
+        webhook_configs:
+          - url: 'http://127.0.0.1:9093/-/ready'
+            send_resolved: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smartshop-alertmanager
+  namespace: smartshop-observability
+  labels:
+    app: smartshop-alertmanager
+    app.kubernetes.io/part-of: smartshop-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smartshop-alertmanager
+  template:
+    metadata:
+      labels:
+        app: smartshop-alertmanager
+    spec:
+      containers:
+        - name: alertmanager
+          image: prom/alertmanager:v0.28.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - "--config.file=/etc/alertmanager/alertmanager.yml"
+            - "--storage.path=/alertmanager"
+          ports:
+            - containerPort: 9093
+              name: http
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: 9093
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: 9093
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          volumeMounts:
+            - name: config
+              mountPath: /etc/alertmanager
+      volumes:
+        - name: config
+          configMap:
+            name: alertmanager-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smartshop-alertmanager
+  namespace: smartshop-observability
+  labels:
+    app: smartshop-alertmanager
+    app.kubernetes.io/part-of: smartshop-platform
+spec:
+  type: ClusterIP
+  selector:
+    app: smartshop-alertmanager
+  ports:
+    - name: http
+      port: 9093
+      targetPort: 9093
+

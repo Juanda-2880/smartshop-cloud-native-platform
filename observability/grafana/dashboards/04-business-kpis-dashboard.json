@@ -1,0 +1,111 @@
+{
+  "uid": "smartshop-business-kpis",
+  "title": "SmartShop — 04 Business KPIs (Active Users, Products Visited, Carts, Orders, Conversions)",
+  "tags": ["smartshop", "business", "ecommerce-kpis"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Usuarios Activos (smartshop_active_users)",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 4, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "max(smartshop_active_users)",
+          "legendFormat": "Active Users",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Productos Visualizados (smartshop_products_visited_total)",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 5, "x": 4, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum(smartshop_products_visited_total)",
+          "legendFormat": "Products Visited",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Carritos Creados / Actualizados (smartshop_carts_updated_total)",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 5, "x": 9, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum(smartshop_carts_updated_total)",
+          "legendFormat": "Carts Created/Updated",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Compras Realizadas (smartshop_orders_completed_total)",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 5, "x": 14, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum(smartshop_orders_completed_total)",
+          "legendFormat": "Completed Orders",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Tasa de Conversión (smartshop_conversion_rate)",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 5, "x": 19, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "max(smartshop_conversion_rate) * 100",
+          "legendFormat": "Conversion Rate %",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Embudo de Conversión E-Commerce en Tiempo Real",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "max(smartshop_active_users)",
+          "legendFormat": "Usuarios Activos",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(smartshop_products_visited_total)",
+          "legendFormat": "Productos Visualizados",
+          "refId": "B"
+        },
+        {
+          "expr": "sum(smartshop_carts_updated_total)",
+          "legendFormat": "Carritos Creados",
+          "refId": "C"
+        },
+        {
+          "expr": "sum(smartshop_orders_completed_total)",
+          "legendFormat": "Compras Realizadas",
+          "refId": "D"
+        }
+      ]
+    }
+  ]
+}
+

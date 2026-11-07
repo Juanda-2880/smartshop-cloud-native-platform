@@ -1,0 +1,429 @@
+﻿apiVersion: v1
+data:
+  01-infrastructure-use-dashboard.json: |
+    {
+      "uid": "smartshop-infra-use",
+      "title": "SmartShop — 01 Infrastructure & USE Model (CPU, RAM, Disk, Network)",
+      "tags": ["smartshop", "infrastructure", "use-model"],
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "10s",
+      "panels": [
+        {
+          "id": 1,
+          "title": "CPU Utilization % (USE: Utilization)",
+          "type": "gauge",
+          "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "(1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[2m]))) * 100",
+              "legendFormat": "CPU Utilization %",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "RAM Utilization % (USE: Utilization)",
+          "type": "gauge",
+          "gridPos": { "h": 8, "w": 6, "x": 6, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+              "legendFormat": "Memory Utilization %",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Disk Utilization % (USE: Utilization)",
+          "type": "gauge",
+          "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "(1 - (avg(disk_free_bytes) / avg(disk_total_bytes))) * 100",
+              "legendFormat": "Disk Utilization %",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "title": "System Load Saturation (USE: Saturation — 1m Load / Cores)",
+          "type": "stat",
+          "gridPos": { "h": 8, "w": 6, "x": 18, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "node_load1 / count(node_cpu_seconds_total{mode=\"idle\"})",
+              "legendFormat": "CPU Saturation Ratio",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "title": "Network Throughput RX/TX Bytes/sec (USE: Network Utilization)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "sum(rate(node_network_receive_bytes_total[2m]))",
+              "legendFormat": "Network RX (Bytes/s)",
+              "refId": "A"
+            },
+            {
+              "expr": "sum(rate(node_network_transmit_bytes_total[2m]))",
+              "legendFormat": "Network TX (Bytes/s)",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "title": "Network & Disk Errors / Drops (USE: Errors)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "sum(rate(node_network_receive_errs_total[2m])) + sum(rate(node_network_transmit_errs_total[2m]))",
+              "legendFormat": "Network Interface Errors/s",
+              "refId": "A"
+            },
+            {
+              "expr": "sum(rate(node_network_receive_drop_total[2m])) + sum(rate(node_network_transmit_drop_total[2m]))",
+              "legendFormat": "Network Packet Drops/s",
+              "refId": "B"
+            }
+          ]
+        }
+      ]
+    }
+  02-kubernetes-cluster-dashboard.json: |
+    {
+      "uid": "smartshop-k8s-cluster",
+      "title": "SmartShop — 02 Kubernetes Cluster & Workloads (Pods, Nodes, Deployments, Services, Namespaces)",
+      "tags": ["smartshop", "kubernetes", "cluster"],
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "10s",
+      "panels": [
+        {
+          "id": 1,
+          "title": "Cluster Nodes Ready",
+          "type": "stat",
+          "gridPos": { "h": 6, "w": 4, "x": 0, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "count(kube_node_info)",
+              "legendFormat": "Nodes",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "Active Namespaces",
+          "type": "stat",
+          "gridPos": { "h": 6, "w": 5, "x": 4, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "count(kube_namespace_created)",
+              "legendFormat": "Namespaces",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Running Pods in Cluster",
+          "type": "stat",
+          "gridPos": { "h": 6, "w": 5, "x": 9, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "sum(kube_pod_status_phase{phase=\"Running\"})",
+              "legendFormat": "Running Pods",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "title": "Available Deployments",
+          "type": "stat",
+          "gridPos": { "h": 6, "w": 5, "x": 14, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "count(kube_deployment_status_replicas_available)",
+              "legendFormat": "Deployments",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "title": "Kubernetes Services",
+          "type": "stat",
+          "gridPos": { "h": 6, "w": 5, "x": 19, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "count(kube_service_info)",
+              "legendFormat": "Services",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "title": "Pods Running by Namespace",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "sum by (namespace) (kube_pod_status_phase{phase=\"Running\"})",
+              "legendFormat": "{{namespace}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "title": "Deployment Available Replicas in SmartShop",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "kube_deployment_status_replicas_available{namespace=~\"smartshop.*\"}",
+              "legendFormat": "{{namespace}}/{{deployment}}",
+              "refId": "A"
+            }
+          ]
+        }
+      ]
+    }
+  03-application-red-dashboard.json: |
+    {
+      "uid": "smartshop-app-red",
+      "title": "SmartShop — 03 Application & RED Model (Requests, Latency, Throughput, Error Rate)",
+      "tags": ["smartshop", "application", "red-model"],
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "10s",
+      "panels": [
+        {
+          "id": 1,
+          "title": "Total HTTP Requests Processed",
+          "type": "stat",
+          "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "sum(http_server_requests_seconds_count{application=\"smartshop-backend\"})",
+              "legendFormat": "Total Requests",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "RED Rate — Throughput (Requests / sec)",
+          "type": "stat",
+          "gridPos": { "h": 6, "w": 6, "x": 6, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "sum(rate(http_server_requests_seconds_count{application=\"smartshop-backend\"}[2m]))",
+              "legendFormat": "Throughput (req/s)",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "RED Errors — HTTP Error Rate (%)",
+          "type": "gauge",
+          "gridPos": { "h": 6, "w": 6, "x": 12, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "(sum(rate(http_server_requests_seconds_count{application=\"smartshop-backend\", status=~\"5..\"}[2m])) or vector(0)) / clamp_min(sum(rate(http_server_requests_seconds_count{application=\"smartshop-backend\"}[2m])), 0.0001) * 100",
+              "legendFormat": "Error Rate %",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "title": "RED Duration — Mean Response Latency (ms)",
+          "type": "stat",
+          "gridPos": { "h": 6, "w": 6, "x": 18, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "(sum(rate(http_server_requests_seconds_sum{application=\"smartshop-backend\"}[2m])) / clamp_min(sum(rate(http_server_requests_seconds_count{application=\"smartshop-backend\"}[2m])), 0.0001)) * 1000",
+              "legendFormat": "Latency (ms)",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "title": "RED Rate: Request Throughput by Endpoint URI",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "sum by (uri, method, status) (rate(http_server_requests_seconds_count{application=\"smartshop-backend\"}[2m]))",
+              "legendFormat": "{{method}} {{uri}} ({{status}})",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "title": "RED Duration: Max & Mean Latency by Endpoint (ms)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "max by (uri) (http_server_requests_seconds_max{application=\"smartshop-backend\"}) * 1000",
+              "legendFormat": "Max {{uri}} (ms)",
+              "refId": "A"
+            }
+          ]
+        }
+      ]
+    }
+  04-business-kpis-dashboard.json: |
+    {
+      "uid": "smartshop-business-kpis",
+      "title": "SmartShop — 04 Business KPIs (Active Users, Products Visited, Carts, Orders, Conversions)",
+      "tags": ["smartshop", "business", "ecommerce-kpis"],
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "10s",
+      "panels": [
+        {
+          "id": 1,
+          "title": "Usuarios Activos (smartshop_active_users)",
+          "type": "stat",
+          "gridPos": { "h": 6, "w": 4, "x": 0, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "max(smartshop_active_users)",
+              "legendFormat": "Active Users",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "Productos Visualizados (smartshop_products_visited_total)",
+          "type": "stat",
+          "gridPos": { "h": 6, "w": 5, "x": 4, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "sum(smartshop_products_visited_total)",
+              "legendFormat": "Products Visited",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Carritos Creados / Actualizados (smartshop_carts_updated_total)",
+          "type": "stat",
+          "gridPos": { "h": 6, "w": 5, "x": 9, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "sum(smartshop_carts_updated_total)",
+              "legendFormat": "Carts Created/Updated",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "title": "Compras Realizadas (smartshop_orders_completed_total)",
+          "type": "stat",
+          "gridPos": { "h": 6, "w": 5, "x": 14, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "sum(smartshop_orders_completed_total)",
+              "legendFormat": "Completed Orders",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "title": "Tasa de Conversión (smartshop_conversion_rate)",
+          "type": "gauge",
+          "gridPos": { "h": 6, "w": 5, "x": 19, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "max(smartshop_conversion_rate) * 100",
+              "legendFormat": "Conversion Rate %",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "title": "Embudo de Conversión E-Commerce en Tiempo Real",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 6 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "max(smartshop_active_users)",
+              "legendFormat": "Usuarios Activos",
+              "refId": "A"
+            },
+            {
+              "expr": "sum(smartshop_products_visited_total)",
+              "legendFormat": "Productos Visualizados",
+              "refId": "B"
+            },
+            {
+              "expr": "sum(smartshop_carts_updated_total)",
+              "legendFormat": "Carritos Creados",
+              "refId": "C"
+            },
+            {
+              "expr": "sum(smartshop_orders_completed_total)",
+              "legendFormat": "Compras Realizadas",
+              "refId": "D"
+            }
+          ]
+        }
+      ]
+    }
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards-json
+  namespace: smartshop-observability

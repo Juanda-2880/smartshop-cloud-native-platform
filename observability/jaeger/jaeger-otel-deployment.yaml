@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smartshop-jaeger
+  namespace: smartshop-observability
+  labels:
+    app: smartshop-jaeger
+    app.kubernetes.io/part-of: smartshop-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smartshop-jaeger
+  template:
+    metadata:
+      labels:
+        app: smartshop-jaeger
+    spec:
+      containers:
+        - name: jaeger
+          image: jaegertracing/all-in-one:1.66.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: COLLECTOR_OTLP_ENABLED
+              value: "true"
+          ports:
+            - containerPort: 16686
+              name: query-http
+            - containerPort: 4317
+              name: otlp-grpc
+            - containerPort: 4318
+              name: otlp-http
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 14269
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smartshop-jaeger
+  namespace: smartshop-observability
+  labels:
+    app: smartshop-jaeger
+spec:
+  type: ClusterIP
+  selector:
+    app: smartshop-jaeger
+  ports:
+    - name: query-http
+      port: 16686
+      targetPort: 16686
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+
