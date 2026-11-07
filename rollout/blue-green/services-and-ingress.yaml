@@ -1,0 +1,102 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: smartshop-active-service
+  namespace: smartshop-rollouts
+  labels:
+    app: smartshop-app
+    role: active-production
+    app.kubernetes.io/part-of: smartshop-platform
+spec:
+  type: ClusterIP
+  selector:
+    app: smartshop-app
+    slot: blue
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smartshop-preview-service
+  namespace: smartshop-rollouts
+  labels:
+    app: smartshop-app
+    role: preview-candidate
+    app.kubernetes.io/part-of: smartshop-platform
+spec:
+  type: ClusterIP
+  selector:
+    app: smartshop-app
+    slot: green
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smartshop-blue-service
+  namespace: smartshop-rollouts
+  labels:
+    app: smartshop-app
+    slot: blue
+spec:
+  type: ClusterIP
+  selector:
+    app: smartshop-app
+    slot: blue
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smartshop-green-service
+  namespace: smartshop-rollouts
+  labels:
+    app: smartshop-app
+    slot: green
+spec:
+  type: ClusterIP
+  selector:
+    app: smartshop-app
+    slot: green
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: smartshop-bluegreen-ingress
+  namespace: smartshop-rollouts
+  labels:
+    app: smartshop-app
+    app.kubernetes.io/part-of: smartshop-platform
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: rollout.smartshop.local
+      http:
+        paths:
+          - path: /preview
+            pathType: Prefix
+            backend:
+              service:
+                name: smartshop-preview-service
+                port:
+                  number: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: smartshop-active-service
+                port:
+                  number: 80

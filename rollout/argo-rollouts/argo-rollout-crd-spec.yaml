@@ -1,0 +1,68 @@
+# Argo Rollouts Declarative Specifications (Blue-Green & Canary)
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: smartshop-bluegreen-rollout
+  namespace: smartshop-rollouts
+  labels:
+    app: smartshop-app
+    strategy: blue-green
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: smartshop-app
+  template:
+    metadata:
+      labels:
+        app: smartshop-app
+        version: 2.0.0-green
+    spec:
+      containers:
+        - name: smartshop-app
+          image: smartshop-frontend:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+  strategy:
+    blueGreen:
+      activeService: smartshop-active-service
+      previewService: smartshop-preview-service
+      autoPromotionEnabled: false
+      scaleDownDelaySeconds: 30
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: smartshop-canary-rollout
+  namespace: smartshop-rollouts
+  labels:
+    app: smartshop-app
+    strategy: canary
+spec:
+  replicas: 4
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: smartshop-app
+  template:
+    metadata:
+      labels:
+        app: smartshop-app
+        version: 2.0.0-canary
+    spec:
+      containers:
+        - name: smartshop-app
+          image: smartshop-frontend:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+  strategy:
+    canary:
+      steps:
+        - setWeight: 20
+        - pause: { duration: 30s }
+        - setWeight: 50
+        - pause: { duration: 30s }
+        - setWeight: 100

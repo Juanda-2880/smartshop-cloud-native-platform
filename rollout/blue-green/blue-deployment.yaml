@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: smartshop-blue-config
+  namespace: smartshop-rollouts
+  labels:
+    app: smartshop-app
+    slot: blue
+data:
+  nginx.conf: |
+    server {
+        listen 80;
+        server_name _;
+
+        location = /healthz {
+            access_log off;
+            add_header Content-Type application/json;
+            return 200 '{"status":"UP","slot":"blue","version":"1.0.0-blue"}';
+        }
+
+        location / {
+            add_header Content-Type application/json;
+            add_header X-SmartShop-Slot "blue";
+            add_header X-SmartShop-Version "1.0.0-blue";
+            return 200 '{"service":"smartshop-platform","slot":"blue","version":"1.0.0-blue","channel":"stable","status":"UP"}';
+        }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smartshop-app-blue
+  namespace: smartshop-rollouts
+  labels:
+    app: smartshop-app
+    slot: blue
+    version: 1.0.0-blue
+    app.kubernetes.io/part-of: smartshop-platform
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: smartshop-app
+      slot: blue
+  template:
+    metadata:
+      labels:
+        app: smartshop-app
+        slot: blue
+        version: 1.0.0-blue
+    spec:
+      containers:
+        - name: smartshop-app
+          image: smartshop-frontend:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: http
+          resources:
+            requests:
+              cpu: "30m"
+              memory: "32Mi"
+            limits:
+              cpu: "150m"
+              memory: "64Mi"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            initialDelaySeconds: 2
+            periodSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: nginx.conf
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: smartshop-blue-config
