@@ -63,3 +63,4 @@ smartshop-postgres   postgres:17-alpine         Up 27 seconds (healthy)   0.0.0.
 - [x] Orquestación `docker-compose.yml` con healthcheck conditions
 - [x] ✅ Build exitoso (`smartshop-frontend:1.0.0` y `smartshop-backend:1.0.0`)
 - [x] ✅ Containers saludables (`smartshop-postgres`, `smartshop-backend`, `smartshop-frontend` en estado `healthy`)
+
