@@ -72,3 +72,4 @@ rec-elk-warm-tier      Storage & JVM Optimization smartshop-logging smartshop-lo
 - [x] ✅ Dashboard operativo (`smartshop-kubecost:9090` `1/1 Running`)
 - [x] ✅ Costos visibles (desglose mensual y horario en USD para los 4 namespaces y 11 workloads)
 - [x] ✅ Recomendaciones visibles (`3` recomendaciones de Right-Sizing, HPA y Storage con ahorro estimado de \$9.01 USD/mes)
+
