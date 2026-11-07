@@ -11,3 +11,4 @@ smartshop-preview-service   ClusterIP   10.101.243.69   <none>        80/TCP    
 
 $ kubectl exec -n smartshop-rollouts deploy/smartshop-app-blue -- wget -qO- http://smartshop-preview-service.smartshop-rollouts.svc.cluster.local/
 {"service":"smartshop-platform","slot":"green","version":"2.0.0-green","channel":"candidate","features":["ai-recommendations","instant-checkout"],"status":"UP"}
+

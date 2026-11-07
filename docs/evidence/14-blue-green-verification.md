@@ -21,3 +21,4 @@ Implement and verify an enterprise **Blue-Green Deployment** strategy (alongside
 - [x] ✅ Switch exitoso (`smartshop-active-service` conmutado a `slot=green`, sirviendo `2.0.0-green`)
 - [x] ✅ Rollback exitoso (`smartshop-active-service` revertido a `slot=blue`, restaurando `1.0.0-blue`)
 - [x] ✅ Sin interrupción del servicio (`30/30` peticiones HTTP `200 OK`, `0` fallos, `0 ms` downtime)
+

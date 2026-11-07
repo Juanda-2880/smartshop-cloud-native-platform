@@ -13,3 +13,4 @@ smartshop-active-service   10.244.0.36:80,10.244.0.38:80   2m5s
 
 $ kubectl exec -n smartshop-rollouts deploy/smartshop-app-blue -- wget -qO- http://smartshop-active-service.smartshop-rollouts.svc.cluster.local/
 {"service":"smartshop-platform","slot":"blue","version":"1.0.0-blue","channel":"stable","status":"UP"}
+

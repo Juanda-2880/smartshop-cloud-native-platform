@@ -83,3 +83,4 @@ spec:
         - name: nginx-config
           configMap:
             name: smartshop-green-config
+

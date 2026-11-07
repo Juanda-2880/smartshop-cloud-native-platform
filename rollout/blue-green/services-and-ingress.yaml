@@ -100,3 +100,4 @@ spec:
                 name: smartshop-active-service
                 port:
                   number: 80
+
