@@ -92,3 +92,4 @@ secret/smartshop-secret   Opaque   5      47s
 - [x] ✅ Pods Running (`5/5` pods `1/1 Running` en `smartshop`)
 - [x] ✅ Services funcionales (`ClusterIP` + `EndpointSlice` activos para `postgres`, `backend`, `frontend`)
 - [x] ✅ Ingress funcional (`smartshop-ingress` enrutando `/`, `/api` y `/actuator` a través de `ingress-nginx-controller`)
+
