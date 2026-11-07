@@ -1,26 +1,28 @@
 # Task 07 — Kubernetes Base (Minikube) Verification Evidence
 
 ## 1. Objective & Scope
+
 Deploy the **SmartShop Cloud-Native Platform** core stack (`smartshop-postgres`, `smartshop-backend`, `smartshop-frontend`) on a local **Minikube** (`Kubernetes v1.37.0`) cluster with isolated `Namespace`, `ConfigMap`, `Secret`, `Deployment`, `Service`, and `Ingress` (`ingress-nginx`) resources.
 
 ## 2. Implemented Kubernetes Manifests
 
-| Directory / File | Resource Kind | Description |
-| :--- | :--- | :--- |
-| `k8s/namespaces/smartshop-namespaces.yaml` | `Namespace` | Creates `smartshop`, `smartshop-observability`, `smartshop-logging`, `smartshop-finops`, and `smartshop-rollouts`. |
-| `k8s/configmaps/smartshop-configmap.yaml` | `ConfigMap` | Centralizes non-sensitive runtime settings (`SPRING_PROFILES_ACTIVE=postgres`, `POSTGRES_HOST=smartshop-postgres`, `POSTGRES_DB=smartshop`, `KEYCLOAK_ISSUER_URI`, `VITE_API_BASE_URL`). |
-| `k8s/secrets/smartshop-secret.yaml` | `Secret` | Stores sensitive credentials (`POSTGRES_USER`, `POSTGRES_PASSWORD`, `KEYCLOAK_ADMIN`, `KEYCLOAK_ADMIN_PASSWORD`, `JWT_SECRET_SALT`). |
-| `k8s/deployments/postgres-deployment.yaml` | `Deployment` | Deploys `postgres:17-alpine` (`1/1` replica) with readiness/liveness `pg_isready` probes and CPU/Memory requests & limits. |
-| `k8s/deployments/backend-deployment.yaml` | `Deployment` | Deploys `smartshop-backend:1.0.0` (`2/2` replicas) with Prometheus scrape annotations and Actuator readiness/liveness HTTP probes. |
-| `k8s/deployments/frontend-deployment.yaml` | `Deployment` | Deploys `smartshop-frontend:1.0.0` (`2/2` replicas) with `/healthz` readiness/liveness HTTP probes. |
-| `k8s/services/postgres-service.yaml` | `Service` | `ClusterIP` service exposing PostgreSQL on port `5432`. |
-| `k8s/services/backend-service.yaml` | `Service` | `ClusterIP` service exposing Spring Boot API & Actuator on port `8080`. |
-| `k8s/services/frontend-service.yaml` | `Service` | `ClusterIP` service exposing Nginx SPA on port `80`. |
-| `k8s/ingress/smartshop-ingress.yaml` | `Ingress` | `ingressClassName: nginx` routing `/api` and `/actuator` to `smartshop-backend:8080` and `/` to `smartshop-frontend:80` for `smartshop.local`. |
+| Directory / File                           | Resource Kind | Description                                                                                                                                                                              |
+| :----------------------------------------- | :------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `k8s/namespaces/smartshop-namespaces.yaml` | `Namespace`   | Creates `smartshop`, `smartshop-observability`, `smartshop-logging`, `smartshop-finops`, and `smartshop-rollouts`.                                                                       |
+| `k8s/configmaps/smartshop-configmap.yaml`  | `ConfigMap`   | Centralizes non-sensitive runtime settings (`SPRING_PROFILES_ACTIVE=postgres`, `POSTGRES_HOST=smartshop-postgres`, `POSTGRES_DB=smartshop`, `KEYCLOAK_ISSUER_URI`, `VITE_API_BASE_URL`). |
+| `k8s/secrets/smartshop-secret.yaml`        | `Secret`      | Stores sensitive credentials (`POSTGRES_USER`, `POSTGRES_PASSWORD`, `KEYCLOAK_ADMIN`, `KEYCLOAK_ADMIN_PASSWORD`, `JWT_SECRET_SALT`).                                                     |
+| `k8s/deployments/postgres-deployment.yaml` | `Deployment`  | Deploys `postgres:17-alpine` (`1/1` replica) with readiness/liveness `pg_isready` probes and CPU/Memory requests & limits.                                                               |
+| `k8s/deployments/backend-deployment.yaml`  | `Deployment`  | Deploys `smartshop-backend:1.0.0` (`2/2` replicas) with Prometheus scrape annotations and Actuator readiness/liveness HTTP probes.                                                       |
+| `k8s/deployments/frontend-deployment.yaml` | `Deployment`  | Deploys `smartshop-frontend:1.0.0` (`2/2` replicas) with `/healthz` readiness/liveness HTTP probes.                                                                                      |
+| `k8s/services/postgres-service.yaml`       | `Service`     | `ClusterIP` service exposing PostgreSQL on port `5432`.                                                                                                                                  |
+| `k8s/services/backend-service.yaml`        | `Service`     | `ClusterIP` service exposing Spring Boot API & Actuator on port `8080`.                                                                                                                  |
+| `k8s/services/frontend-service.yaml`       | `Service`     | `ClusterIP` service exposing Nginx SPA on port `80`.                                                                                                                                     |
+| `k8s/ingress/smartshop-ingress.yaml`       | `Ingress`     | `ingressClassName: nginx` routing `/api` and `/actuator` to `smartshop-backend:8080` and `/` to `smartshop-frontend:80` for `smartshop.local`.                                           |
 
 ## 3. Verification Evidence (DoD Validation)
 
 ### 3.1 Cluster & Namespace Verification (`kubectl get ns`)
+
 ```text
 NAME                      STATUS   AGE
 default                   Active   2m10s
@@ -36,6 +38,7 @@ smartshop-rollouts        Active   47s
 ```
 
 ### 3.2 Pods, Services, ConfigMaps, Secrets & Endpoints (`kubectl get pods,svc,ep,cm,secret -n smartshop`)
+
 ```text
 NAME                                      READY   STATUS    RESTARTS   AGE   IP            NODE
 pod/smartshop-backend-64f66fb94f-7bb84    1/1     Running   0          46s   10.244.0.7    minikube
@@ -62,9 +65,10 @@ secret/smartshop-secret   Opaque   5      47s
 ```
 
 ### 3.3 Ingress Controller & End-to-End Routing Verification
+
 - **Frontend via NGINX Ingress (`Host: smartshop.local`, `GET /healthz`)**:
   ```json
-  {"status":"UP","service":"smartshop-frontend"}
+  { "status": "UP", "service": "smartshop-frontend" }
   ```
 - **Backend Actuator via NGINX Ingress (`Host: smartshop.local`, `GET /actuator/health`)**:
   ```json
@@ -83,6 +87,7 @@ secret/smartshop-secret   Opaque   5      47s
   Returned all `4` Flyway-seeded enterprise categories from `smartshop-postgres`.
 
 ## 4. Definition of Done (DoD) Checklist
+
 - [x] `Namespace` (`k8s/namespaces/smartshop-namespaces.yaml`)
 - [x] `Deployment` (`k8s/deployments/postgres-deployment.yaml`, `backend-deployment.yaml`, `frontend-deployment.yaml`)
 - [x] `Service` (`k8s/services/postgres-service.yaml`, `backend-service.yaml`, `frontend-service.yaml`)
@@ -92,4 +97,3 @@ secret/smartshop-secret   Opaque   5      47s
 - [x] ✅ Pods Running (`5/5` pods `1/1 Running` en `smartshop`)
 - [x] ✅ Services funcionales (`ClusterIP` + `EndpointSlice` activos para `postgres`, `backend`, `frontend`)
 - [x] ✅ Ingress funcional (`smartshop-ingress` enrutando `/`, `/api` y `/actuator` a través de `ingress-nginx-controller`)
-

@@ -1,7 +1,9 @@
 # Task 12 — Kubecost Cloud-Native FinOps Verification Evidence
 
 ## 1. Objective & Scope
+
 Implement **Kubecost FinOps Cost Allocation & Optimization** in namespace `smartshop-finops` on Minikube (`Kubernetes v1.37.0`) to visualize real-time cloud-native costs across:
+
 - **Namespace** (`smartshop`, `smartshop-observability`, `smartshop-logging`, `smartshop-finops`)
 - **Deployment** (`11` platform deployments)
 - **Workload** (Replicas, CPU Cores, RAM GiB, Storage GiB, Efficiency %)
@@ -9,14 +11,15 @@ Implement **Kubecost FinOps Cost Allocation & Optimization** in namespace `smart
 
 ## 2. Implemented FinOps Manifests
 
-| File | Description |
-| :--- | :--- |
-| `cost-management/kubecost/kubecost-config.yaml` | RBAC (`ServiceAccount`, `ClusterRole`, `ClusterRoleBinding`), CNCF unit pricing model (`pricing-model.json`), and Kubecost Allocation & Recommendations engine (`server.mjs`). |
+| File                                                | Description                                                                                                                                                                                                                              |
+| :-------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cost-management/kubecost/kubecost-config.yaml`     | RBAC (`ServiceAccount`, `ClusterRole`, `ClusterRoleBinding`), CNCF unit pricing model (`pricing-model.json`), and Kubecost Allocation & Recommendations engine (`server.mjs`).                                                           |
 | `cost-management/kubecost/kubecost-deployment.yaml` | Deploys `smartshop-kubecost` (`9090/TCP`) in `smartshop-finops` with Prometheus `/metrics` exporter, `/healthz` readiness/liveness probes, `/model/allocation` API, `/model/savings/recommendations` API, and HTML5 FinOps Dashboard UI. |
 
 ## 3. Verification Evidence (DoD Validation)
 
 ### 3.1 Kubecost Pod & Service (`✅ Dashboard operativo`)
+
 ```text
 NAME                                      READY   STATUS    RESTARTS   AGE   IP            NODE
 pod/smartshop-kubecost-7ff9c54cc5-sqslb   1/1     Running   0          7s    10.244.0.28   minikube
@@ -24,11 +27,13 @@ pod/smartshop-kubecost-7ff9c54cc5-sqslb   1/1     Running   0          7s    10.
 NAME                         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE   SELECTOR
 service/smartshop-kubecost   ClusterIP   10.103.15.115   <none>        9090/TCP   7s    app=smartshop-kubecost
 ```
+
 - `GET http://127.0.0.1:9090/healthz` → `{"status":"UP","service":"smartshop-kubecost","version":"2.5.2"}`
 
 ### 3.2 Cost Visibility by Namespace, Deployment & Workload (`✅ Costos visibles`)
 
 #### A. Cost Allocation by Namespace (`GET /model/allocation?aggregate=namespace`)
+
 ```text
 namespace               cpuCostMonthly ramCostMonthly pvCostMonthly totalMonthlyCost workloadsCount
 ---------               -------------- -------------- ------------- ---------------- --------------
@@ -39,6 +44,7 @@ smartshop-finops                  1.15           0.19          0.00             
 ```
 
 #### B. Cost Allocation by Deployment & Workload (`GET /model/allocation?aggregate=workload`)
+
 ```text
 namespace               workload                           replicas cpuCores ramGiB totalMonthlyCost efficiencyPercent
 ---------               --------                           -------- -------- ------ ---------------- -----------------
@@ -56,7 +62,9 @@ smartshop-finops        deployment/smartshop-kubecost             1     0.05 0.0
 ```
 
 ### 3.3 Right-Sizing & FinOps Savings Recommendations (`✅ Recomendaciones visibles`)
+
 Querying `GET http://127.0.0.1:9090/model/savings/recommendations` (Total Estimated Savings: **\$9.01 USD/month**):
+
 ```text
 id                     category                   namespace         deployment         estimatedMonthlySavingsUSD confidence
 --                     --------                   ---------         ----------         -------------------------- ----------
@@ -66,10 +74,10 @@ rec-elk-warm-tier      Storage & JVM Optimization smartshop-logging smartshop-lo
 ```
 
 ## 4. Definition of Done (DoD) Checklist
+
 - [x] Visualización por `Namespace` (`/model/allocation?aggregate=namespace`)
 - [x] Visualización por `Deployment` (`/model/allocation?aggregate=deployment`)
 - [x] Visualización por `Workload` (`/model/allocation?aggregate=workload`)
 - [x] ✅ Dashboard operativo (`smartshop-kubecost:9090` `1/1 Running`)
 - [x] ✅ Costos visibles (desglose mensual y horario en USD para los 4 namespaces y 11 workloads)
 - [x] ✅ Recomendaciones visibles (`3` recomendaciones de Right-Sizing, HPA y Storage con ahorro estimado de \$9.01 USD/mes)
-

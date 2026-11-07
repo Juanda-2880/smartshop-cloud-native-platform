@@ -1,24 +1,26 @@
 # Task 15 — Operational Platform Scripts Verification Evidence
 
 ## 1. Objective & Scope
+
 Implement, document, and verify the 6 operational platform scripts in `scripts/` (`start-all.sh`, `stop-all.sh`, `restart-all.sh`, `status.sh`, `validate.sh`, `benchmark.sh`) with executable permissions (`100755`) and LF line endings enforced via `.gitattributes`.
 
 ## 2. Implemented Scripts & Documentation
 
-| File | Mode | Description |
-| :--- | :---: | :--- |
-| `scripts/start-all.sh` | `100755` | Idempotently starts Minikube, enables addons, and reconciles all platform manifests across all 5 namespaces. |
-| `scripts/stop-all.sh` | `100755` | Scales down workloads (`--scale-zero`) or stops the Minikube VM (`--cluster`). |
-| `scripts/restart-all.sh` | `100755` | Reconciles manifests and performs a zero-downtime rolling restart. |
-| `scripts/status.sh` | `100755` | Displays health and resource status across `smartshop`, `smartshop-observability`, `smartshop-logging`, `smartshop-finops`, and `smartshop-rollouts`. |
-| `scripts/validate.sh` | `100755` | Runs 17 automated end-to-end checks verifying every platform component and DoD. |
-| `scripts/benchmark.sh` | `100755` | Runs sequential HTTP performance and reliability benchmarks across Frontend, Backend API, and Blue-Green services. |
-| `scripts/README.md` | `100644` | Complete operational runbook and command reference for `scripts/`. |
-| `.gitattributes` | `100644` | Enforces `*.sh text eol=lf` across Windows, Linux, and macOS. |
+| File                     |   Mode   | Description                                                                                                                                           |
+| :----------------------- | :------: | :---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `scripts/start-all.sh`   | `100755` | Idempotently starts Minikube, enables addons, and reconciles all platform manifests across all 5 namespaces.                                          |
+| `scripts/stop-all.sh`    | `100755` | Scales down workloads (`--scale-zero`) or stops the Minikube VM (`--cluster`).                                                                        |
+| `scripts/restart-all.sh` | `100755` | Reconciles manifests and performs a zero-downtime rolling restart.                                                                                    |
+| `scripts/status.sh`      | `100755` | Displays health and resource status across `smartshop`, `smartshop-observability`, `smartshop-logging`, `smartshop-finops`, and `smartshop-rollouts`. |
+| `scripts/validate.sh`    | `100755` | Runs 17 automated end-to-end checks verifying every platform component and DoD.                                                                       |
+| `scripts/benchmark.sh`   | `100755` | Runs sequential HTTP performance and reliability benchmarks across Frontend, Backend API, and Blue-Green services.                                    |
+| `scripts/README.md`      | `100644` | Complete operational runbook and command reference for `scripts/`.                                                                                    |
+| `.gitattributes`         | `100644` | Enforces `*.sh text eol=lf` across Windows, Linux, and macOS.                                                                                         |
 
 ## 3. Verification Evidence (DoD Validation)
 
 ### 3.1 `scripts/validate.sh` Execution Output (`17 PASSED | 0 FAILED`)
+
 ```text
 ==================================================================
  [SmartShop] Automated End-to-End Platform Validation Suite
@@ -46,6 +48,7 @@ Implement, document, and verify the 6 operational platform scripts in `scripts/`
 ```
 
 ### 3.2 `scripts/benchmark.sh` Execution Output (`0% Error Rate`)
+
 ```text
 ==================================================================
  [SmartShop] Cloud-Native Performance & Reliability Benchmark
@@ -66,7 +69,7 @@ Implement, document, and verify the 6 operational platform scripts in `scripts/`
 ```
 
 ## 4. Definition of Done (DoD) Checklist
+
 - [x] ✅ Scripts ejecutables (`100755` permisos Git y terminaciones `LF` vía `.gitattributes`)
 - [x] ✅ Scripts documentados (`scripts/README.md`, docblocks en cada script y `docs/evidence/15-platform-scripts-verification.md`)
 - [x] ✅ Scripts funcionales (`validate.sh` `17/17 PASS`, `benchmark.sh` `0% errors`, `status.sh` verificados en vivo)
-
