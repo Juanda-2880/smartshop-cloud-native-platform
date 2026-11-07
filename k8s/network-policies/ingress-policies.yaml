@@ -1,0 +1,91 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend-ingress-policy
+  namespace: smartshop
+  labels:
+    app.kubernetes.io/part-of: smartshop-platform
+    app.kubernetes.io/component: network-security
+spec:
+  podSelector:
+    matchLabels:
+      app: smartshop-frontend
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: smartshop-observability
+        - podSelector:
+            matchLabels:
+              role: authorized-client
+        - ipBlock:
+            cidr: 10.244.0.1/32
+        - ipBlock:
+            cidr: 192.168.49.0/24
+      ports:
+        - protocol: TCP
+          port: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-ingress-policy
+  namespace: smartshop
+  labels:
+    app.kubernetes.io/part-of: smartshop-platform
+    app.kubernetes.io/component: network-security
+spec:
+  podSelector:
+    matchLabels:
+      app: smartshop-backend
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: smartshop-observability
+        - podSelector:
+            matchLabels:
+              app: smartshop-frontend
+        - podSelector:
+            matchLabels:
+              role: authorized-client
+        - ipBlock:
+            cidr: 10.244.0.1/32
+        - ipBlock:
+            cidr: 192.168.49.0/24
+      ports:
+        - protocol: TCP
+          port: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-ingress-policy
+  namespace: smartshop
+  labels:
+    app.kubernetes.io/part-of: smartshop-platform
+    app.kubernetes.io/component: network-security
+spec:
+  podSelector:
+    matchLabels:
+      app: smartshop-postgres
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: smartshop-backend
+      ports:
+        - protocol: TCP
+          port: 5432
